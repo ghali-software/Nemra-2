@@ -13,7 +13,6 @@ import { sendCallSummary } from "./sms.js";
 import { loadHistory, saveCall, getHistory, getStats } from "./call-history.js";
 import { seedAdmin } from "./auth.js";
 import authRoutes from "./routes-auth.js";
-import recordingRoutes from "./routes-recordings.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -43,13 +42,9 @@ app.use(express.static(join(__dirname, "public")));
 app.get("/dashboard", (_req, res) => res.sendFile(join(__dirname, "public", "index.html")));
 app.get("/login", (_req, res) => res.sendFile(join(__dirname, "public", "login.html")));
 app.get("/users", (_req, res) => res.sendFile(join(__dirname, "public", "users.html")));
-app.get("/recordings", (_req, res) => res.sendFile(join(__dirname, "public", "recordings.html")));
 
 // ── Auth & User management routes ──
 app.use("/api", express.json(), authRoutes);
-
-// ── Recording routes (callback uses urlencoded, API uses json) ──
-app.use("/api", express.urlencoded({ extended: false }), recordingRoutes);
 
 app.post("/voice", express.urlencoded({ extended: false }), (req, res) => {
   const callSid = req.body.CallSid || "";
@@ -383,6 +378,7 @@ wss.on("connection", (twilioWs) => {
     apiKey: GEMINI_KEY,
     onAudio: (pcm24k) => {
       if (!streamSid) return;
+      if (twilioWs.readyState !== 1) return;
       const mulaw = pcm24kToMulaw8k(pcm24k);
       twilioWs.send(JSON.stringify({
         event: "media",
@@ -441,18 +437,6 @@ wss.on("connection", (twilioWs) => {
           nudge = "(Appel qui démarre — salue l'appelant avec ta phrase d'ouverture bilingue courte, puis attends.)";
         }
         setTimeout(() => gemini?.sendText(nudge), 300);
-
-        // Start recording via Twilio REST API (non-blocking)
-        try {
-          twilioClient.calls(callSid).recordings.create({
-            recordingChannels: "dual",
-            recordingStatusCallback: `https://${PUBLIC_HOST}/api/twilio/recording-callback`,
-            recordingStatusCallbackEvent: ["completed"],
-            recordingStatusCallbackMethod: "POST",
-          }).then(r => console.log(`[recording] started: ${r.sid}`))
-            .catch(e => console.error(`[recording] start failed: ${e.message}`));
-        } catch (e) { console.error(`[recording] create error: ${e.message}`); }
-
         break;
 
       case "media": {
