@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nemra 06 — Standard IA</title>
+  <title>Nemra 06 : Standard IA</title>
+  <link rel="icon" type="image/png" href="/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -306,9 +307,9 @@
       <div class="modal-field">
         <label>Destinataire</label>
         <select id="msgTarget">
-          <option value="oumaima">Oumaima — Commercial</option>
-          <option value="ghali">Ghali — Direction</option>
-          <option value="zineb">Zineb — Support</option>
+          <option value="oumaima">Oumaima : Commercial</option>
+          <option value="ghali">Ghali : Direction</option>
+          <option value="zineb">Zineb : Support</option>
         </select>
       </div>
       <div class="modal-field">
@@ -340,8 +341,8 @@
     <div class="header-actions">
       <div class="sentiment-pill" id="sentimentPill"><span id="sentimentIcon"></span><span id="sentimentText"></span></div>
       <div class="status-pill"><div class="status-dot" id="statusDot"></div><span id="statusText">En attente</span></div>
-      <button class="btn btn-amber" onclick="openModal()" title="Envoyer un message a un agent">&#9993; Message</button>
-      <button class="btn btn-accent" id="btnSimulate" title="Simuler un appel demo">&#9654; Simuler</button>
+      <button class="btn btn-amber" onclick="openModal()" title="Envoyer un message a un agent">Message</button>
+      <button class="btn btn-accent" id="btnSimulate" title="Simuler un appel demo">Simuler</button>
       <div class="nav-links">
         <a href="/dashboard" class="nav-link active">Dashboard</a>
         <a href="/recordings" class="nav-link" id="navRecordings" style="display:none">Enregistrements</a>
@@ -371,12 +372,12 @@
         </div>
       </div>
       <div class="sidebar">
-        <div class="s-card"><div class="s-card-title">&#9742; Appelant</div><div class="s-card-value" id="callerNumber">--</div><div class="s-card-sub" id="callerInfo"></div></div>
-        <div class="s-card"><div class="s-card-title">&#9881; Reconnaissance</div><div id="returningCaller"><span class="s-card-sub">Aucune donnee</span></div></div>
-        <div class="s-card"><div class="s-card-title">&#9733; Intention</div><div id="intentArea"><span class="s-card-sub">En ecoute...</span></div></div>
-        <div class="s-card"><div class="s-card-title">&#10140; Transfert</div><div id="transferArea"><span class="s-card-sub">--</span></div></div>
-        <div class="s-card"><div class="s-card-title">&#9776; Chronologie</div><div class="timeline" id="timeline"></div></div>
-        <div class="s-card" style="text-align:center"><div class="s-card-title" style="justify-content:center">&#9200; Duree</div><div class="s-card-value duration" id="duration">0:00</div></div>
+        <div class="s-card"><div class="s-card-title">Appelant</div><div class="s-card-value" id="callerNumber">--</div><div class="s-card-sub" id="callerInfo"></div></div>
+        <div class="s-card"><div class="s-card-title">Reconnaissance</div><div id="returningCaller"><span class="s-card-sub">Aucune donnee</span></div></div>
+        <div class="s-card"><div class="s-card-title">Intention</div><div id="intentArea"><span class="s-card-sub">En ecoute...</span></div></div>
+        <div class="s-card"><div class="s-card-title">Transfert</div><div id="transferArea"><span class="s-card-sub">--</span></div></div>
+        <div class="s-card"><div class="s-card-title">Chronologie</div><div class="timeline" id="timeline"></div></div>
+        <div class="s-card" style="text-align:center"><div class="s-card-title" style="justify-content:center">Duree</div><div class="s-card-value duration" id="duration">0:00</div></div>
       </div>
     </div>
   </div>
@@ -386,9 +387,9 @@
     <div class="section-header">
       <div class="panel-label" style="margin:0">Statistiques</div>
       <div class="actions">
-        <button class="btn btn-blue" onclick="exportHistoryExcel()">&#128196; Exporter Historique</button>
-        <button class="btn btn-accent" onclick="exportCallersExcel()">&#128196; Exporter Appelants</button>
-        <button class="btn btn-amber" onclick="exportTranscriptionsExcel()">&#128196; Exporter Transcriptions</button>
+        <button class="btn btn-blue" onclick="exportHistoryExcel()">Exporter Historique</button>
+        <button class="btn btn-accent" onclick="exportCallersExcel()">Exporter Appelants</button>
+        <button class="btn btn-amber" onclick="exportTranscriptionsExcel()">Exporter Transcriptions</button>
       </div>
     </div>
     <div class="stats-grid">
@@ -420,8 +421,8 @@
     <div class="history-toolbar">
       <div class="panel-label" style="margin:0">Historique des appels</div>
       <div class="actions">
-        <button class="btn btn-blue" onclick="exportHistoryExcel()">&#128196; Excel Historique</button>
-        <button class="btn btn-accent" onclick="exportTranscriptionsExcel()">&#128196; Excel Transcriptions</button>
+        <button class="btn btn-blue" onclick="exportHistoryExcel()">Excel Historique</button>
+        <button class="btn btn-accent" onclick="exportTranscriptionsExcel()">Excel Transcriptions</button>
       </div>
     </div>
     <div class="history-header">
@@ -512,7 +513,7 @@
     /* ── Modal: Transcript ── */
     function openTranscriptModal(call) {
       currentTranscriptData = call;
-      $("transcriptModalTitle").textContent = `Transcription — ${call.callerName || call.from || "Inconnu"} (${new Date(call.date).toLocaleDateString("fr-FR")})`;
+      $("transcriptModalTitle").textContent = `Transcription : ${call.callerName || call.from || "Inconnu"} (${new Date(call.date).toLocaleDateString("fr-FR")})`;
       const body = (call.transcript || []).map(t =>
         `<div class="t-line"><span class="t-role ${t.role}">${t.role === "agent" ? "Agent IA" : "Appelant"}:</span> ${t.text}</div>`
       ).join("");
@@ -523,7 +524,7 @@
     function exportCurrentTranscript() {
       if (!currentTranscriptData) return;
       const c = currentTranscriptData;
-      let text = `Transcription — ${c.callerName || "Inconnu"}\nDate: ${c.date}\nNumero: ${c.from}\nIntention: ${c.intent}\nTransfere a: ${c.transferTo}\nSentiment: ${c.sentiment}\nDuree: ${c.duration}s\n\n`;
+      let text = `Transcription : ${c.callerName || "Inconnu"}\nDate: ${c.date}\nNumero: ${c.from}\nIntention: ${c.intent}\nTransfere a: ${c.transferTo}\nSentiment: ${c.sentiment}\nDuree: ${c.duration}s\n\n`;
       text += (c.transcript || []).map(t => `${t.role === "agent" ? "Agent IA" : "Appelant"}: ${t.text}`).join("\n");
       downloadText(`transcription_${c.callerName || "appel"}_${new Date(c.date).toISOString().slice(0,10)}.txt`, text);
     }
@@ -541,13 +542,13 @@
       if (simulating) return;
       simulating = true;
       $("btnSimulate").disabled = true;
-      $("btnSimulate").innerHTML = "&#9654; En cours...";
+      $("btnSimulate").innerHTML = "En cours...";
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
       document.querySelector('[data-view="live"]').classList.add("active");
       $("view-live").classList.add("active");
       try { await fetch("/api/simulate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scenario: scenarioIdx++ % 3 }) }); } catch(e) { console.error(e); }
-      setTimeout(() => { simulating = false; $("btnSimulate").disabled = false; $("btnSimulate").innerHTML = "&#9654; Simuler"; }, 8000);
+      setTimeout(() => { simulating = false; $("btnSimulate").disabled = false; $("btnSimulate").innerHTML = "Simuler"; }, 8000);
     });
 
     /* ── Excel Export ── */
@@ -638,10 +639,10 @@
 
     /* ── Sentiment ── */
     const SENTIMENT_MAP = {
-      positive: { icon: "&#9650;", text: "Positif", cls: "positive" },
-      negative: { icon: "&#9660;", text: "Negatif", cls: "negative" },
-      urgent:   { icon: "&#9888;", text: "Urgent", cls: "urgent" },
-      neutral:  { icon: "&#9679;", text: "Neutre", cls: "neutral" },
+      positive: { icon: "", text: "Positif", cls: "positive" },
+      negative: { icon: "", text: "Negatif", cls: "negative" },
+      urgent:   { icon: "", text: "Urgent", cls: "urgent" },
+      neutral:  { icon: "", text: "Neutre", cls: "neutral" },
     };
     function setSentiment(s) {
       const pill = $("sentimentPill"), info = SENTIMENT_MAP[s] || SENTIMENT_MAP.neutral;
@@ -727,7 +728,7 @@
       $("agentsGrid").innerHTML = agents.map(a=>`<div class="agent-row">
         <div class="agent-avatar ${a.key}">${a.name[0]}</div>
         <div class="agent-info"><div class="agent-name">${a.name}</div><div class="agent-role">${a.role} &middot; ${a.calls} appels</div></div>
-        <button class="agent-msg-btn" onclick="openModal('${a.key}')" title="Envoyer un SMS">&#9993;</button>
+        <button class="agent-msg-btn" onclick="openModal('${a.key}')" title="Envoyer un SMS">SMS</button>
         <div class="agent-status-badge ${a.available?'available':'offline'}">${a.available?'Dispo':'Absent'}</div>
       </div>`).join("");
     }
@@ -750,7 +751,7 @@
           <span class="hi-target">${c.transferTo||"--"}</span>
           <span class="hi-duration">${dur}</span>
           <span class="hi-sentiment ${sentiment}">${sentLabel}</span>
-          <span class="hi-expand">&#9662;</span>
+          <span class="hi-expand">+</span>
         </div>`;
       }).join("");
     }

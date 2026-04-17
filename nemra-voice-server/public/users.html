@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nemra 06 — Gestion Employes</title>
+  <title>Nemra 06 : Gestion Employes</title>
+  <link rel="icon" type="image/png" href="/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -189,7 +190,7 @@
             <span class="email">${u.email}</span>
             <span class="name">${u.first_name} ${u.last_name}</span>
             <span><span class="role-badge ${u.role}">${u.role}</span></span>
-            <span style="font-size:.75rem;color:var(--text-secondary)">${u.personal_phone || '—'}</span>
+            <span style="font-size:.75rem;color:var(--text-secondary)">${u.personal_phone || '-'}</span>
             <span class="status-dot ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Actif' : 'Inactif'}</span>
             <span class="actions">
               <button onclick='openEdit(${JSON.stringify(u).replace(/'/g,"&#39;")})'>Modifier</button>

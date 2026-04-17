@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nemra 06 — Enregistrements</title>
+  <title>Nemra 06 : Enregistrements</title>
+  <link rel="icon" type="image/png" href="/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -220,7 +221,7 @@
         const d = new Date(r.created_at + "Z");
         const dateStr = d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
         const dur = `${Math.floor(r.duration_seconds / 60)}:${String(r.duration_seconds % 60).padStart(2, "0")}`;
-        const sidShort = r.call_sid ? r.call_sid.slice(0, 16) + "..." : "—";
+        const sidShort = r.call_sid ? r.call_sid.slice(0, 16) + "..." : "-";
         return `<div class="rec-item ${selectedRec?.id === r.id ? 'selected' : ''}" onclick="selectRec(${i})">
           <span class="ri-date">${dateStr}</span>
           <span class="ri-sid" title="${r.call_sid}">${sidShort}</span>
@@ -238,7 +239,7 @@
       document.getElementById("playerView").classList.add("active");
 
       const d = new Date(selectedRec.created_at + "Z");
-      document.getElementById("playerTitle").textContent = `Enregistrement — ${d.toLocaleDateString("fr-FR")}`;
+      document.getElementById("playerTitle").textContent = `Enregistrement : ${d.toLocaleDateString("fr-FR")}`;
       document.getElementById("playerSid").textContent = selectedRec.call_sid;
       document.getElementById("playerDur").textContent = `${selectedRec.duration_seconds}s`;
       document.getElementById("playerCh").textContent = selectedRec.channels === 2 ? "Dual" : "Mono";
