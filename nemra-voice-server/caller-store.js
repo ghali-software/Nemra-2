@@ -21,6 +21,10 @@ export function getCaller(phone) {
   return store.get(phone) || null;
 }
 
+export function getAllCallers() {
+  return Object.fromEntries(store);
+}
+
 export function saveCaller(phone, { name, subject }) {
   store.set(phone, {
     name: name || "Inconnu",

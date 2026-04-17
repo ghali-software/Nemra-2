@@ -3,29 +3,37 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nemra AI — Standard Live</title>
+  <title>Nemra 06 — Standard IA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <style>
     :root {
-      --bg: #060911;
-      --surface: rgba(13, 17, 28, 0.7);
-      --surface-solid: #0d111c;
-      --glass: rgba(15, 20, 35, 0.55);
+      --bg: #0a0814;
+      --surface: rgba(16, 12, 28, 0.7);
+      --surface-solid: #110d1c;
+      --glass: rgba(18, 14, 32, 0.55);
       --glass-border: rgba(255,255,255,0.06);
-      --glass-border-hover: rgba(255,255,255,0.1);
-      --accent: #0ef6cc;
-      --accent-dim: rgba(14, 246, 204, 0.12);
-      --accent-glow: rgba(14, 246, 204, 0.25);
-      --blue: #3b82f6;
-      --blue-dim: rgba(59, 130, 246, 0.12);
-      --amber: #fbbf24;
-      --amber-dim: rgba(251, 191, 36, 0.1);
-      --red: #f43f5e;
-      --red-dim: rgba(244, 63, 94, 0.1);
-      --text: #e8ecf4;
-      --text-secondary: #7a8599;
-      --text-tertiary: #4a5568;
+      --glass-border-hover: rgba(255,255,255,0.12);
+      --accent: #9B8EC4;
+      --accent-dim: rgba(155, 142, 196, 0.12);
+      --accent-glow: rgba(155, 142, 196, 0.3);
+      --gold: #D4A843;
+      --gold-dim: rgba(212, 168, 67, 0.12);
+      --gold-glow: rgba(212, 168, 67, 0.25);
+      --blue: #8B7CB8;
+      --blue-dim: rgba(139, 124, 184, 0.12);
+      --amber: #D4A843;
+      --amber-dim: rgba(212, 168, 67, 0.1);
+      --red: #e05275;
+      --red-dim: rgba(224, 82, 117, 0.1);
+      --green: #6dc98f;
+      --green-dim: rgba(109, 201, 143, 0.1);
+      --purple: #9B8EC4;
+      --purple-dim: rgba(155, 142, 196, 0.1);
+      --text: #ede8f4;
+      --text-secondary: #8a7f99;
+      --text-tertiary: #564e68;
       --radius: 16px;
       --radius-sm: 10px;
     }
@@ -43,19 +51,15 @@
       position: relative;
     }
 
-    /* ── Ambient background ── */
     .bg-mesh {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(ellipse 60% 50% at 15% 20%, rgba(14,246,204,0.04) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 60% at 85% 80%, rgba(59,130,246,0.04) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(14,246,204,0.015) 0%, transparent 60%);
+        radial-gradient(ellipse 60% 50% at 15% 20%, rgba(155,142,196,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 85% 80%, rgba(212,168,67,0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(155,142,196,0.02) 0%, transparent 60%);
       animation: meshDrift 20s ease-in-out infinite alternate;
     }
-    @keyframes meshDrift {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(15deg); }
-    }
+    @keyframes meshDrift { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(15deg); } }
 
     .noise-overlay {
       position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35;
@@ -66,351 +70,561 @@
     header {
       position: relative; z-index: 10;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2rem;
+      padding: .65rem 1.5rem;
       border-bottom: 1px solid var(--glass-border);
       backdrop-filter: blur(20px);
       background: var(--glass);
     }
+    .logo { display: flex; align-items: center; }
+    .logo-img { height: 70px; width: auto; filter: brightness(1.1); }
 
-    .logo {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700; font-size: 1.3rem;
-      letter-spacing: -.03em;
-      display: flex; align-items: center; gap: .65rem;
-    }
-    .logo-mark {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), var(--blue));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: .85rem; color: #060911;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .logo-text span { color: var(--accent); }
-
-    .header-center { position: absolute; left: 50%; transform: translateX(-50%); }
-    .waveform-container {
-      display: flex; align-items: center; gap: 2px; height: 28px;
-      opacity: 0; transition: opacity .6s ease;
-    }
+    .header-center { display: flex; align-items: center; gap: 1rem; position: absolute; left: 50%; transform: translateX(-50%); }
+    .waveform-container { display: flex; align-items: center; gap: 2px; height: 24px; opacity: 0; transition: opacity .6s ease; }
     .waveform-container.active { opacity: 1; }
-    .wave-bar {
-      width: 3px; border-radius: 2px;
-      background: var(--accent);
-      height: 4px;
-      transition: height .15s ease;
-    }
+    .wave-bar { width: 2.5px; border-radius: 2px; background: var(--accent); height: 4px; transition: height .15s ease; }
     .waveform-container.active .wave-bar { animation: wave 1.2s ease-in-out infinite; }
-    @keyframes wave {
-      0%, 100% { height: 4px; opacity: .3; }
-      50% { height: 22px; opacity: 1; }
-    }
+    @keyframes wave { 0%, 100% { height: 4px; opacity: .3; } 50% { height: 20px; opacity: 1; } }
 
-    .status-area { display: flex; align-items: center; gap: .75rem; }
-    .status-pill {
-      display: flex; align-items: center; gap: .5rem;
-      padding: .4rem .9rem; border-radius: 999px;
-      font-size: .8rem; font-weight: 500;
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(10px);
-      background: var(--glass);
-      transition: all .4s ease;
-    }
+    .header-actions { display: flex; align-items: center; gap: .5rem; }
+
+    .status-pill { display: flex; align-items: center; gap: .45rem; padding: .3rem .7rem; border-radius: 999px; font-size: .72rem; font-weight: 500; border: 1px solid var(--glass-border); background: var(--glass); transition: all .4s ease; }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-tertiary); transition: all .4s ease; }
     .status-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); animation: glow 2s infinite; }
-    .status-dot.transferring { background: var(--amber); box-shadow: 0 0 10px rgba(251,191,36,.4); animation: glow 1s infinite; }
+    .status-dot.transferring { background: var(--amber); box-shadow: 0 0 10px rgba(212,168,67,.4); animation: glow 1s infinite; }
     @keyframes glow { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 
-    /* ── Main Grid ── */
-    .main {
-      position: relative; z-index: 10;
-      display: grid; grid-template-columns: 1fr 360px;
-      flex: 1; overflow: hidden;
-      gap: 1px;
-    }
+    .sentiment-pill { display: flex; align-items: center; gap: .35rem; padding: .3rem .65rem; border-radius: 999px; font-size: .7rem; font-weight: 600; border: 1px solid var(--glass-border); background: var(--glass); transition: all .5s ease; opacity: 0; transform: scale(0.9); }
+    .sentiment-pill.visible { opacity: 1; transform: scale(1); }
+    .sentiment-pill.positive { border-color: rgba(34,197,94,0.3); color: var(--green); background: var(--green-dim); }
+    .sentiment-pill.negative { border-color: rgba(244,63,94,0.3); color: var(--red); background: var(--red-dim); }
+    .sentiment-pill.urgent { border-color: rgba(244,63,94,0.5); color: var(--red); background: var(--red-dim); animation: urgentPulse 1s infinite; }
+    .sentiment-pill.neutral { border-color: rgba(155,142,196,0.3); color: var(--accent); background: var(--accent-dim); }
+    @keyframes urgentPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.4); } 50% { box-shadow: 0 0 12px 4px rgba(244,63,94,0.2); } }
 
-    /* ── Transcript Panel ── */
-    .transcript-panel {
-      display: flex; flex-direction: column;
-      padding: 1.25rem 1.5rem 1rem;
-      overflow: hidden;
-    }
-    .panel-label {
-      font-family: 'Outfit', sans-serif;
-      font-size: .65rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .14em;
-      color: var(--text-tertiary);
-      margin-bottom: 1rem;
-      display: flex; align-items: center; gap: .5rem;
-    }
-    .panel-label::after {
-      content: ''; flex: 1; height: 1px;
-      background: linear-gradient(to right, var(--glass-border), transparent);
-    }
+    .btn { display: flex; align-items: center; gap: .35rem; padding: .35rem .75rem; border-radius: 8px; font-size: .72rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .2s ease; border: 1px solid; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.4; pointer-events: none; }
+    .btn-accent { border-color: rgba(155,142,196,0.2); background: linear-gradient(135deg, rgba(155,142,196,0.1), rgba(212,168,67,0.08)); color: var(--accent); }
+    .btn-accent:hover { background: linear-gradient(135deg, rgba(155,142,196,0.18), rgba(212,168,67,0.14)); border-color: rgba(155,142,196,0.35); }
+    .btn-blue { border-color: rgba(212,168,67,0.2); background: var(--blue-dim); color: var(--blue); }
+    .btn-blue:hover { background: rgba(212,168,67,0.18); border-color: rgba(212,168,67,0.35); }
+    .btn-amber { border-color: rgba(212,168,67,0.2); background: var(--amber-dim); color: var(--amber); }
+    .btn-amber:hover { background: rgba(212,168,67,0.18); border-color: rgba(212,168,67,0.35); }
 
-    .transcript-body {
-      flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem;
-      padding-right: .5rem;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,.08) transparent;
-    }
+    /* ── Tab Bar ── */
+    .tab-bar { position: relative; z-index: 10; display: flex; gap: 0; border-bottom: 1px solid var(--glass-border); background: var(--glass); backdrop-filter: blur(10px); }
+    .tab { padding: .55rem 1.3rem; font-size: .75rem; font-weight: 500; color: var(--text-tertiary); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s ease; user-select: none; }
+    .tab:hover { color: var(--text-secondary); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; font-size: .63rem; font-weight: 700; background: var(--accent-dim); color: var(--accent); margin-left: .35rem; }
+
+    /* ── Views ── */
+    .view { display: none; flex: 1; overflow: hidden; position: relative; z-index: 10; }
+    .view.active { display: flex; }
+
+    /* ── LIVE VIEW ── */
+    .live-view { display: flex; }
+    .live-view.active { display: flex; }
+    .main-grid { display: grid; grid-template-columns: 1fr 340px; flex: 1; overflow: hidden; gap: 1px; }
+
+    .transcript-panel { display: flex; flex-direction: column; padding: 1rem 1.25rem .75rem; overflow: hidden; }
+    .panel-label { font-family: 'Outfit', sans-serif; font-size: .58rem; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: var(--text-tertiary); margin-bottom: .7rem; display: flex; align-items: center; gap: .5rem; }
+    .panel-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--glass-border), transparent); }
+
+    .transcript-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: .55rem; padding-right: .5rem; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.08) transparent; }
     .transcript-body::-webkit-scrollbar { width: 4px; }
     .transcript-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 2px; }
 
-    .msg {
-      max-width: 75%; padding: .7rem 1rem; border-radius: var(--radius-sm);
-      font-size: .88rem; line-height: 1.55;
-      animation: msgIn .35s cubic-bezier(.22,1,.36,1);
-      position: relative;
-    }
-    .msg.user {
-      align-self: flex-start;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--glass-border);
-      border-bottom-left-radius: 3px;
-    }
-    .msg.agent {
-      align-self: flex-end;
-      background: linear-gradient(135deg, rgba(14,246,204,0.1), rgba(59,130,246,0.08));
-      border: 1px solid rgba(14,246,204,0.12);
-      border-bottom-right-radius: 3px;
-    }
-    .msg .label {
-      font-family: 'Outfit', sans-serif;
-      font-size: .6rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: .1em; margin-bottom: .25rem;
-    }
+    .msg { max-width: 78%; padding: .55rem .85rem; border-radius: var(--radius-sm); font-size: .82rem; line-height: 1.5; animation: msgIn .35s cubic-bezier(.22,1,.36,1); position: relative; }
+    .msg.user { align-self: flex-start; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-bottom-left-radius: 3px; }
+    .msg.agent { align-self: flex-end; background: linear-gradient(135deg, rgba(155,142,196,0.1), rgba(212,168,67,0.08)); border: 1px solid rgba(155,142,196,0.12); border-bottom-right-radius: 3px; }
+    .msg .label { font-family: 'Outfit', sans-serif; font-size: .53rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; margin-bottom: .15rem; }
     .msg.user .label { color: var(--text-tertiary); }
     .msg.agent .label { color: var(--accent); }
-    @keyframes msgIn {
-      from { opacity: 0; transform: translateY(12px) scale(.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-    .empty-state {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      flex: 1; gap: 1.5rem; text-align: center;
-    }
-    .empty-rings {
-      position: relative; width: 120px; height: 120px;
-    }
-    .empty-rings .ring {
-      position: absolute; border-radius: 50%;
-      border: 1px solid rgba(14,246,204,0.1);
-      animation: ringPulse 3s ease-in-out infinite;
-    }
-    .empty-rings .ring:nth-child(1) { inset: 0; animation-delay: 0s; }
-    .empty-rings .ring:nth-child(2) { inset: 15px; animation-delay: .4s; border-color: rgba(14,246,204,0.15); }
-    .empty-rings .ring:nth-child(3) { inset: 30px; animation-delay: .8s; border-color: rgba(14,246,204,0.2); }
-    .empty-rings .ring-dot {
-      position: absolute; inset: 45px;
-      border-radius: 50%; background: var(--accent); opacity: .15;
-      animation: ringPulse 3s ease-in-out infinite 1.2s;
-    }
-    @keyframes ringPulse {
-      0%, 100% { transform: scale(1); opacity: .5; }
-      50% { transform: scale(1.08); opacity: 1; }
-    }
-    .empty-text { color: var(--text-secondary); font-size: .9rem; line-height: 1.6; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 1.25rem; text-align: center; }
+    .empty-rings { position: relative; width: 90px; height: 90px; }
+    .empty-rings .ring { position: absolute; border-radius: 50%; border: 1px solid rgba(155,142,196,0.1); animation: ringPulse 3s ease-in-out infinite; }
+    .empty-rings .ring:nth-child(1) { inset: 0; }
+    .empty-rings .ring:nth-child(2) { inset: 12px; animation-delay: .4s; border-color: rgba(155,142,196,0.15); }
+    .empty-rings .ring:nth-child(3) { inset: 24px; animation-delay: .8s; border-color: rgba(155,142,196,0.2); }
+    .empty-rings .ring-dot { position: absolute; inset: 34px; border-radius: 50%; background: var(--accent); opacity: .15; animation: ringPulse 3s ease-in-out infinite 1.2s; }
+    @keyframes ringPulse { 0%, 100% { transform: scale(1); opacity: .5; } 50% { transform: scale(1.08); opacity: 1; } }
+    .empty-text { color: var(--text-secondary); font-size: .83rem; line-height: 1.6; }
     .empty-text strong { color: var(--accent); font-weight: 600; }
-    .empty-text .phone {
-      display: inline-block; margin-top: .5rem;
-      font-family: 'JetBrains Mono', monospace; font-size: .95rem;
-      padding: .35rem .8rem; border-radius: 8px;
-      background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(14,246,204,0.15);
-    }
 
     /* ── Sidebar ── */
-    .sidebar {
-      display: flex; flex-direction: column; gap: 1px;
-      overflow-y: auto; padding: 1.25rem 1.25rem 1rem;
-      border-left: 1px solid var(--glass-border);
-      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.06) transparent;
-    }
-
-    .s-card {
-      padding: 1rem 1.15rem; border-radius: var(--radius-sm);
-      background: var(--glass); border: 1px solid var(--glass-border);
-      margin-bottom: .75rem;
-      transition: border-color .3s ease;
-    }
+    .sidebar { display: flex; flex-direction: column; gap: 1px; overflow-y: auto; padding: .85rem .85rem .7rem; border-left: 1px solid var(--glass-border); scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.06) transparent; }
+    .s-card { padding: .7rem .9rem; border-radius: var(--radius-sm); background: var(--glass); border: 1px solid var(--glass-border); margin-bottom: .5rem; transition: border-color .3s ease; }
     .s-card:hover { border-color: var(--glass-border-hover); }
-    .s-card-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: .6rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .12em;
-      color: var(--text-tertiary); margin-bottom: .6rem;
-      display: flex; align-items: center; gap: .4rem;
-    }
-    .s-card-title .icon { font-size: .75rem; }
-    .s-card-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .95rem; font-weight: 500; color: var(--text);
-    }
-    .s-card-sub { font-size: .78rem; color: var(--text-secondary); margin-top: .3rem; }
-
-    .s-card-value.duration {
-      font-family: 'Outfit', sans-serif;
-      font-size: 2rem; font-weight: 300; letter-spacing: .04em;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .intent-badge {
-      display: inline-flex; align-items: center; gap: .4rem;
-      padding: .35rem .75rem; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: .82rem; font-weight: 600;
-      background: var(--accent-dim); color: var(--accent);
-      border: 1px solid rgba(14,246,204,0.12);
-      animation: badgeIn .4s cubic-bezier(.22,1,.36,1);
-    }
+    .s-card-title { font-family: 'Outfit', sans-serif; font-size: .55rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: .4rem; display: flex; align-items: center; gap: .4rem; }
+    .s-card-value { font-family: 'JetBrains Mono', monospace; font-size: .85rem; font-weight: 500; color: var(--text); }
+    .s-card-sub { font-size: .72rem; color: var(--text-secondary); margin-top: .2rem; }
+    .s-card-value.duration { font-family: 'Outfit', sans-serif; font-size: 1.7rem; font-weight: 300; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+    .intent-badge { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .6rem; border-radius: 8px; font-size: .76rem; font-weight: 600; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(155,142,196,0.12); animation: badgeIn .4s cubic-bezier(.22,1,.36,1); }
     @keyframes badgeIn { from { opacity: 0; scale: .9; } to { opacity: 1; scale: 1; } }
-
-    .transfer-card {
-      background: linear-gradient(135deg, rgba(14,246,204,0.06), rgba(59,130,246,0.04));
-      border: 1px solid rgba(14,246,204,0.12); border-radius: var(--radius-sm);
-      padding: .85rem 1rem; animation: badgeIn .4s cubic-bezier(.22,1,.36,1);
-    }
-    .transfer-card .name {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700; font-size: 1.05rem; color: var(--accent);
-    }
-    .transfer-card .role { font-size: .78rem; color: var(--text-secondary); margin-top: .15rem; }
-    .transfer-card .number {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .72rem; color: var(--text-tertiary); margin-top: .4rem;
-    }
-
-    .returning {
-      background: var(--amber-dim); border: 1px solid rgba(251,191,36,0.15);
-      border-radius: var(--radius-sm); padding: .85rem 1rem;
-      animation: badgeIn .4s cubic-bezier(.22,1,.36,1);
-    }
+    .transfer-card { background: linear-gradient(135deg, rgba(155,142,196,0.06), rgba(212,168,67,0.04)); border: 1px solid rgba(155,142,196,0.12); border-radius: var(--radius-sm); padding: .6rem .8rem; animation: badgeIn .4s; }
+    .transfer-card .name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: .95rem; color: var(--accent); }
+    .transfer-card .role { font-size: .72rem; color: var(--text-secondary); margin-top: .1rem; }
+    .transfer-card .number { font-family: 'JetBrains Mono', monospace; font-size: .65rem; color: var(--text-tertiary); margin-top: .25rem; }
+    .returning { background: var(--amber-dim); border: 1px solid rgba(212,168,67,0.15); border-radius: var(--radius-sm); padding: .6rem .8rem; animation: badgeIn .4s; }
     .returning .name { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--amber); }
-    .returning .detail { font-size: .78rem; color: var(--text-secondary); margin-top: .35rem; line-height: 1.5; }
-
-    .timeline { display: flex; flex-direction: column; gap: .6rem; }
-    .timeline-item {
-      display: flex; align-items: flex-start; gap: .6rem;
-      font-size: .78rem; color: var(--text-secondary);
-      animation: msgIn .3s cubic-bezier(.22,1,.36,1);
-    }
-    .timeline-marker {
-      width: 8px; height: 8px; border-radius: 50%;
-      margin-top: .25rem; flex-shrink: 0;
-      background: var(--text-tertiary);
-      position: relative;
-    }
+    .returning .detail { font-size: .72rem; color: var(--text-secondary); margin-top: .25rem; line-height: 1.5; }
+    .timeline { display: flex; flex-direction: column; gap: .45rem; }
+    .timeline-item { display: flex; align-items: flex-start; gap: .45rem; font-size: .7rem; color: var(--text-secondary); animation: msgIn .3s cubic-bezier(.22,1,.36,1); }
+    .timeline-marker { width: 6px; height: 6px; border-radius: 50%; margin-top: .25rem; flex-shrink: 0; background: var(--text-tertiary); }
     .timeline-marker.done { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
-    .timeline-marker.active { background: var(--amber); box-shadow: 0 0 6px rgba(251,191,36,.3); animation: glow 1.2s infinite; }
-    .timeline-marker.error { background: var(--red); box-shadow: 0 0 6px rgba(244,63,94,.3); }
-    .timeline-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .68rem; color: var(--text-tertiary); min-width: 54px;
-    }
-    .timeline-text { line-height: 1.4; }
+    .timeline-marker.active { background: var(--amber); box-shadow: 0 0 6px rgba(212,168,67,.3); animation: glow 1.2s infinite; }
+    .timeline-marker.error { background: var(--red); }
+    .timeline-time { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--text-tertiary); min-width: 48px; }
+
+    /* ── ANALYTICS VIEW ── */
+    .analytics-view { flex-direction: column; overflow-y: auto; padding: 1.25rem 1.5rem; gap: 1rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; }
+    .section-header .actions { display: flex; gap: .4rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .65rem; }
+    .stat-card { padding: .9rem 1rem; border-radius: var(--radius-sm); background: var(--glass); border: 1px solid var(--glass-border); transition: border-color .3s, transform .2s; }
+    .stat-card:hover { border-color: var(--glass-border-hover); transform: translateY(-2px); }
+    .stat-label { font-family: 'Outfit', sans-serif; font-size: .58rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: .35rem; }
+    .stat-number { font-family: 'Outfit', sans-serif; font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; background: linear-gradient(135deg, var(--accent), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-sub { font-size: .7rem; color: var(--text-secondary); margin-top: .15rem; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .65rem; }
+    .chart-card { padding: .9rem 1rem; border-radius: var(--radius-sm); background: var(--glass); border: 1px solid var(--glass-border); }
+    .chart-title { font-family: 'Outfit', sans-serif; font-size: .6rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); margin-bottom: .7rem; }
+    .donut-container { display: flex; align-items: center; gap: 1rem; }
+    .donut-svg { width: 90px; height: 90px; flex-shrink: 0; }
+    .donut-legend { display: flex; flex-direction: column; gap: .35rem; }
+    .donut-legend-item { display: flex; align-items: center; gap: .35rem; font-size: .72rem; }
+    .donut-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .bar-chart { display: flex; flex-direction: column; gap: .5rem; }
+    .bar-row { display: flex; align-items: center; gap: .5rem; }
+    .bar-label { font-size: .7rem; color: var(--text-secondary); min-width: 55px; }
+    .bar-track { flex: 1; height: 18px; border-radius: 4px; background: rgba(255,255,255,0.03); overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width .8s cubic-bezier(.22,1,.36,1); display: flex; align-items: center; padding-left: .4rem; font-size: .62rem; font-weight: 600; color: var(--bg); }
+    .bar-fill.accent { background: linear-gradient(90deg, var(--accent), rgba(155,142,196,0.7)); }
+    .bar-fill.blue { background: linear-gradient(90deg, var(--blue), rgba(212,168,67,0.7)); }
+    .bar-fill.amber { background: linear-gradient(90deg, var(--amber), rgba(212,168,67,0.7)); }
+    .bar-fill.purple { background: linear-gradient(90deg, var(--purple), rgba(168,85,247,0.7)); }
+    .agents-grid { display: flex; flex-direction: column; gap: .4rem; }
+    .agent-row { display: flex; align-items: center; gap: .65rem; padding: .5rem .7rem; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); }
+    .agent-avatar { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .72rem; color: var(--bg); }
+    .agent-avatar.oumaima { background: linear-gradient(135deg, #9B8EC4, #B8A0D6); }
+    .agent-avatar.ghali { background: linear-gradient(135deg, #D4A843, #E8C76A); }
+    .agent-avatar.zineb { background: linear-gradient(135deg, #B8A0D6, #9B8EC4); }
+    .agent-info { flex: 1; }
+    .agent-name { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: .82rem; }
+    .agent-role { font-size: .67rem; color: var(--text-secondary); }
+    .agent-status-badge { padding: .2rem .5rem; border-radius: 6px; font-size: .62rem; font-weight: 600; }
+    .agent-status-badge.available { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+    .agent-status-badge.offline { background: rgba(255,255,255,0.03); color: var(--text-tertiary); border: 1px solid var(--glass-border); }
+    .agent-msg-btn { padding: .2rem .45rem; border-radius: 5px; font-size: .6rem; font-weight: 600; cursor: pointer; background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(212,168,67,0.2); transition: all .2s; }
+    .agent-msg-btn:hover { background: rgba(212,168,67,0.2); }
+
+    /* ── HISTORY VIEW ── */
+    .history-view { flex-direction: column; overflow-y: auto; padding: 1.25rem 1.5rem; gap: .5rem; }
+    .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: .3rem; }
+    .history-toolbar .actions { display: flex; gap: .4rem; }
+    .history-item { display: grid; grid-template-columns: 130px 110px 1fr 95px 70px 65px 40px; align-items: center; gap: .65rem; padding: .6rem .9rem; border-radius: var(--radius-sm); background: var(--glass); border: 1px solid var(--glass-border); font-size: .75rem; transition: border-color .2s; cursor: pointer; }
+    .history-item:hover { border-color: var(--glass-border-hover); }
+    .history-item .hi-date { font-family: 'JetBrains Mono', monospace; font-size: .67rem; color: var(--text-secondary); }
+    .history-item .hi-caller { color: var(--text); font-weight: 500; }
+    .history-item .hi-intent { color: var(--accent); font-weight: 500; }
+    .history-item .hi-target { display: inline-flex; padding: .18rem .45rem; border-radius: 6px; font-size: .67rem; font-weight: 600; background: var(--accent-dim); color: var(--accent); }
+    .history-item .hi-duration { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--text-secondary); }
+    .history-item .hi-sentiment { font-size: .67rem; font-weight: 600; }
+    .history-item .hi-sentiment.positive { color: var(--green); }
+    .history-item .hi-sentiment.negative { color: var(--red); }
+    .history-item .hi-sentiment.urgent { color: var(--red); }
+    .history-item .hi-sentiment.neutral { color: var(--blue); }
+    .history-item .hi-expand { color: var(--text-tertiary); font-size: .8rem; text-align: center; transition: transform .2s; }
+    .history-item.expanded .hi-expand { transform: rotate(180deg); }
+    .history-header { display: grid; grid-template-columns: 130px 110px 1fr 95px 70px 65px 40px; gap: .65rem; padding: .35rem .9rem; font-family: 'Outfit', sans-serif; font-size: .55rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); }
+    .transcript-expand { padding: .7rem 1rem; border-radius: var(--radius-sm); background: rgba(155,142,196,0.03); border: 1px solid var(--glass-border); margin-top: -.2rem; margin-bottom: .3rem; font-size: .78rem; line-height: 1.6; color: var(--text-secondary); animation: msgIn .3s ease; display: none; }
+    .transcript-expand.visible { display: block; }
+    .transcript-expand .t-line { margin-bottom: .25rem; }
+    .transcript-expand .t-role { font-weight: 600; font-size: .7rem; }
+    .transcript-expand .t-role.agent { color: var(--accent); }
+    .transcript-expand .t-role.user { color: var(--text-tertiary); }
+    .no-history { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--text-secondary); font-size: .85rem; gap: .5rem; }
+
+    /* ── Modal ── */
+    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; }
+    .modal-overlay.visible { display: flex; }
+    .modal { background: var(--surface-solid); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.5rem; width: 420px; max-width: 90vw; animation: badgeIn .3s ease; }
+    .modal-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 1rem; }
+    .modal-field { margin-bottom: .8rem; }
+    .modal-field label { display: block; font-size: .7rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .3rem; }
+    .modal-field select, .modal-field textarea { width: 100%; padding: .6rem .8rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; resize: vertical; }
+    .modal-field select:focus, .modal-field textarea:focus { outline: none; border-color: var(--accent); }
+    .modal-field textarea { min-height: 80px; }
+    .modal-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
+    .modal-actions .btn { padding: .45rem 1rem; }
+
+    /* ── Toast Notifications ── */
+    .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: .4rem; }
+    .toast { padding: .6rem 1rem; border-radius: 8px; font-size: .78rem; font-weight: 500; animation: toastIn .4s ease, toastOut .4s ease 4s forwards; max-width: 350px; }
+    .toast.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+    .toast.error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(244,63,94,0.2); }
+    .toast.info { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(212,168,67,0.2); }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+    /* ── Nav & User ── */
+    .nav-links { display: flex; gap: .3rem; }
+    .nav-link { padding: .3rem .65rem; border-radius: 7px; font-size: .7rem; font-weight: 600; text-decoration: none; border: 1px solid var(--glass-border); color: var(--text-secondary); background: transparent; transition: all .2s; }
+    .nav-link:hover { border-color: var(--glass-border-hover); color: var(--text); }
+    .nav-link.active { border-color: rgba(155,142,196,0.3); color: var(--accent); background: var(--accent-dim); }
+    .user-chip { display: flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--text-secondary); }
+    .user-chip strong { color: var(--accent); font-weight: 600; }
+    .user-chip .role-tag { font-size: .6rem; padding: .1rem .35rem; border-radius: 4px; background: var(--gold-dim); color: var(--gold); font-weight: 600; }
+    .btn-logout { padding: .3rem .6rem; border-radius: 7px; font-size: .65rem; font-weight: 600; cursor: pointer; border: 1px solid rgba(224,82,117,0.2); background: rgba(224,82,117,0.06); color: #e05275; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+    .btn-logout:hover { background: rgba(224,82,117,0.12); }
 
     /* ── Responsive ── */
+    @media (max-width: 1100px) { .charts-row { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 900px) {
-      .main { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-      .sidebar { max-height: 45vh; border-left: none; border-top: 1px solid var(--glass-border); }
+      .main-grid { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+      .sidebar { max-height: 40vh; border-left: none; border-top: 1px solid var(--glass-border); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+      .history-item { grid-template-columns: 1fr 1fr; gap: .35rem; font-size: .7rem; }
+      .history-header { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="bg-mesh"></div>
   <div class="noise-overlay"></div>
+  <div class="toast-container" id="toasts"></div>
 
-  <header>
-    <div class="logo">
-      <div class="logo-mark">N</div>
-      <div class="logo-text"><span>Nemra</span> AI</div>
-    </div>
-
-    <div class="header-center">
-      <div class="waveform-container" id="waveform"></div>
-    </div>
-
-    <div class="status-area">
-      <div class="status-pill">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">En attente d'appel</span>
+  <!-- ── Message Modal ── -->
+  <div class="modal-overlay" id="msgModal">
+    <div class="modal">
+      <div class="modal-title">Envoyer un message</div>
+      <div class="modal-field">
+        <label>Destinataire</label>
+        <select id="msgTarget">
+          <option value="oumaima">Oumaima — Commercial</option>
+          <option value="ghali">Ghali — Direction</option>
+          <option value="zineb">Zineb — Support</option>
+        </select>
       </div>
-    </div>
-  </header>
-
-  <div class="main">
-    <div class="transcript-panel">
-      <div class="panel-label">Transcription en direct</div>
-      <div class="transcript-body" id="transcript">
-        <div class="empty-state">
-          <div class="empty-rings">
-            <div class="ring"></div>
-            <div class="ring"></div>
-            <div class="ring"></div>
-            <div class="ring-dot"></div>
-          </div>
-          <div class="empty-text">
-            Le standard IA attend un appel.<br>
-            <span class="phone">+1 510 443-8339</span>
-          </div>
-        </div>
+      <div class="modal-field">
+        <label>Message</label>
+        <textarea id="msgText" placeholder="Tapez votre message ici..."></textarea>
       </div>
-    </div>
-
-    <div class="sidebar">
-      <div class="s-card">
-        <div class="s-card-title"><span class="icon">tel</span> Appelant</div>
-        <div class="s-card-value" id="callerNumber">--</div>
-        <div class="s-card-sub" id="callerInfo"></div>
-      </div>
-
-      <div class="s-card">
-        <div class="s-card-title"><span class="icon">id</span> Reconnaissance</div>
-        <div id="returningCaller"><span class="s-card-sub">Aucune donnee</span></div>
-      </div>
-
-      <div class="s-card">
-        <div class="s-card-title"><span class="icon">brain</span> Intention</div>
-        <div id="intentArea"><span class="s-card-sub">En ecoute...</span></div>
-      </div>
-
-      <div class="s-card">
-        <div class="s-card-title"><span class="icon">fwd</span> Transfert</div>
-        <div id="transferArea"><span class="s-card-sub">--</span></div>
-      </div>
-
-      <div class="s-card">
-        <div class="s-card-title"><span class="icon">log</span> Chronologie</div>
-        <div class="timeline" id="timeline"></div>
-      </div>
-
-      <div class="s-card" style="text-align:center;">
-        <div class="s-card-title" style="justify-content:center"><span class="icon">clock</span> Duree</div>
-        <div class="s-card-value duration" id="duration">0:00</div>
+      <div class="modal-actions">
+        <button class="btn btn-blue" onclick="closeModal()">Annuler</button>
+        <button class="btn btn-accent" id="btnSendMsg" onclick="sendMessage()">Envoyer SMS</button>
       </div>
     </div>
   </div>
 
+  <!-- ── Transcript Modal ── -->
+  <div class="modal-overlay" id="transcriptModal">
+    <div class="modal" style="width:560px">
+      <div class="modal-title" id="transcriptModalTitle">Transcription</div>
+      <div id="transcriptModalBody" style="max-height:50vh;overflow-y:auto;font-size:.82rem;line-height:1.7;color:var(--text-secondary)"></div>
+      <div class="modal-actions">
+        <button class="btn btn-blue" onclick="closeTranscriptModal()">Fermer</button>
+        <button class="btn btn-accent" onclick="exportCurrentTranscript()">Exporter TXT</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="logo"><img src="/logo.png" alt="Nemra 06" class="logo-img"></div>
+    <div class="header-center"><div class="waveform-container" id="waveform"></div></div>
+    <div class="header-actions">
+      <div class="sentiment-pill" id="sentimentPill"><span id="sentimentIcon"></span><span id="sentimentText"></span></div>
+      <div class="status-pill"><div class="status-dot" id="statusDot"></div><span id="statusText">En attente</span></div>
+      <button class="btn btn-amber" onclick="openModal()" title="Envoyer un message a un agent">&#9993; Message</button>
+      <button class="btn btn-accent" id="btnSimulate" title="Simuler un appel demo">&#9654; Simuler</button>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link active">Dashboard</a>
+        <a href="/recordings" class="nav-link" id="navRecordings" style="display:none">Enregistrements</a>
+        <a href="/users" class="nav-link" id="navUsers" style="display:none">Employes</a>
+      </div>
+      <div class="user-chip"><strong id="headerUserName"></strong><span class="role-tag" id="headerUserRole"></span></div>
+      <button class="btn-logout" onclick="doLogout()">Deconnexion</button>
+    </div>
+  </header>
+
+  <div class="tab-bar">
+    <div class="tab active" data-view="live">Appel en direct</div>
+    <div class="tab" data-view="analytics">Analytics <span class="badge" id="totalBadge">0</span></div>
+    <div class="tab" data-view="history">Historique</div>
+  </div>
+
+  <!-- ── LIVE VIEW ── -->
+  <div class="view live-view active" id="view-live">
+    <div class="main-grid">
+      <div class="transcript-panel">
+        <div class="panel-label">Transcription en direct</div>
+        <div class="transcript-body" id="transcript">
+          <div class="empty-state">
+            <div class="empty-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring-dot"></div></div>
+            <div class="empty-text">Le standard IA attend un appel.<br>Cliquez <strong>Simuler</strong> pour une demo.</div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar">
+        <div class="s-card"><div class="s-card-title">&#9742; Appelant</div><div class="s-card-value" id="callerNumber">--</div><div class="s-card-sub" id="callerInfo"></div></div>
+        <div class="s-card"><div class="s-card-title">&#9881; Reconnaissance</div><div id="returningCaller"><span class="s-card-sub">Aucune donnee</span></div></div>
+        <div class="s-card"><div class="s-card-title">&#9733; Intention</div><div id="intentArea"><span class="s-card-sub">En ecoute...</span></div></div>
+        <div class="s-card"><div class="s-card-title">&#10140; Transfert</div><div id="transferArea"><span class="s-card-sub">--</span></div></div>
+        <div class="s-card"><div class="s-card-title">&#9776; Chronologie</div><div class="timeline" id="timeline"></div></div>
+        <div class="s-card" style="text-align:center"><div class="s-card-title" style="justify-content:center">&#9200; Duree</div><div class="s-card-value duration" id="duration">0:00</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ANALYTICS VIEW ── -->
+  <div class="view analytics-view" id="view-analytics">
+    <div class="section-header">
+      <div class="panel-label" style="margin:0">Statistiques</div>
+      <div class="actions">
+        <button class="btn btn-blue" onclick="exportHistoryExcel()">&#128196; Exporter Historique</button>
+        <button class="btn btn-accent" onclick="exportCallersExcel()">&#128196; Exporter Appelants</button>
+        <button class="btn btn-amber" onclick="exportTranscriptionsExcel()">&#128196; Exporter Transcriptions</button>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total appels</div><div class="stat-number" id="statTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">Aujourd'hui</div><div class="stat-number" id="statToday">0</div></div>
+      <div class="stat-card"><div class="stat-label">Cette semaine</div><div class="stat-number" id="statWeek">0</div></div>
+      <div class="stat-card"><div class="stat-label">Taux de transfert</div><div class="stat-number" id="statSuccess">0%</div></div>
+      <div class="stat-card"><div class="stat-label">Duree moy.</div><div class="stat-number" id="statAvgDuration">0s</div></div>
+      <div class="stat-card"><div class="stat-label">Qualif. moy.</div><div class="stat-number" id="statAvgQualif">0s</div><div class="stat-sub">temps avant transfert</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Repartition par agent</div>
+        <div class="donut-container"><svg class="donut-svg" viewBox="0 0 42 42" id="donutChart"><circle cx="21" cy="21" r="15.9" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="5"/></svg><div class="donut-legend" id="donutLegend"></div></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Sentiment des appels</div>
+        <div class="bar-chart" id="sentimentChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Equipe</div>
+        <div class="agents-grid" id="agentsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HISTORY VIEW ── -->
+  <div class="view history-view" id="view-history">
+    <div class="history-toolbar">
+      <div class="panel-label" style="margin:0">Historique des appels</div>
+      <div class="actions">
+        <button class="btn btn-blue" onclick="exportHistoryExcel()">&#128196; Excel Historique</button>
+        <button class="btn btn-accent" onclick="exportTranscriptionsExcel()">&#128196; Excel Transcriptions</button>
+      </div>
+    </div>
+    <div class="history-header">
+      <span>Date</span><span>Appelant</span><span>Intention</span><span>Transfere a</span><span>Duree</span><span>Sentiment</span><span></span>
+    </div>
+    <div id="historyList"><div class="no-history">Aucun appel enregistre</div></div>
+  </div>
+
   <script>
-    /* ── Build waveform bars ── */
+    /* ── Auth guard ── */
+    (function() {
+      const token = localStorage.getItem("nemra_token");
+      const user = JSON.parse(localStorage.getItem("nemra_user") || "null");
+      if (!token || !user) { window.location.href = "/login.html"; return; }
+      document.getElementById("headerUserName").textContent = user.firstName || user.email;
+      document.getElementById("headerUserRole").textContent = user.role;
+      if (["admin", "supervisor"].includes(user.role)) document.getElementById("navRecordings").style.display = "";
+      if (user.role === "admin") document.getElementById("navUsers").style.display = "";
+    })();
+    function doLogout() { localStorage.removeItem("nemra_token"); localStorage.removeItem("nemra_user"); window.location.href = "/login.html"; }
+
+    /* ── Waveform ── */
     (function() {
       const wf = document.getElementById("waveform");
-      for (let i = 0; i < 32; i++) {
-        const bar = document.createElement("div");
-        bar.className = "wave-bar";
-        bar.style.animationDelay = `${(i * 0.06) % 1.2}s`;
-        wf.appendChild(bar);
-      }
+      for (let i = 0; i < 28; i++) { const b = document.createElement("div"); b.className = "wave-bar"; b.style.animationDelay = `${(i*.06)%1.2}s`; wf.appendChild(b); }
     })();
 
-    const $ = (id) => document.getElementById(id);
-    const ws = new WebSocket(`wss://${location.host}/dashboard-ws`);
-    let callActive = false;
-    let callStartTime = null;
-    let durationInterval = null;
-    let lastAgentMsg = null;
+    const $ = id => document.getElementById(id);
+    const proto = location.protocol === "https:" ? "wss:" : "ws:";
+    const ws = new WebSocket(`${proto}//${location.host}/dashboard-ws`);
+    let callActive = false, callStartTime = null, durationInterval = null, lastAgentMsg = null, simulating = false;
+    let currentTranscriptData = null;
 
+    /* ── Tabs ── */
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        tab.classList.add("active");
+        $(`view-${tab.dataset.view}`).classList.add("active");
+      });
+    });
+
+    /* ── Toast ── */
+    function showToast(msg, type = "info") {
+      const t = document.createElement("div");
+      t.className = `toast ${type}`;
+      t.textContent = msg;
+      $("toasts").appendChild(t);
+      setTimeout(() => t.remove(), 4500);
+    }
+
+    /* ── Modal: Message ── */
+    function openModal(target) {
+      $("msgModal").classList.add("visible");
+      if (target) $("msgTarget").value = target;
+      $("msgText").value = "";
+      $("msgText").focus();
+    }
+    function closeModal() { $("msgModal").classList.remove("visible"); }
+
+    async function sendMessage() {
+      const target = $("msgTarget").value;
+      const message = $("msgText").value.trim();
+      if (!message) return;
+      $("btnSendMsg").disabled = true;
+      $("btnSendMsg").textContent = "Envoi...";
+      try {
+        const res = await fetch("/api/send-message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target, message }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast(`SMS envoye a ${data.sentTo}`, "success");
+          closeModal();
+        } else {
+          showToast(`Erreur: ${data.error}`, "error");
+        }
+      } catch(e) {
+        showToast(`Erreur reseau: ${e.message}`, "error");
+      }
+      $("btnSendMsg").disabled = false;
+      $("btnSendMsg").textContent = "Envoyer SMS";
+    }
+
+    /* ── Modal: Transcript ── */
+    function openTranscriptModal(call) {
+      currentTranscriptData = call;
+      $("transcriptModalTitle").textContent = `Transcription — ${call.callerName || call.from || "Inconnu"} (${new Date(call.date).toLocaleDateString("fr-FR")})`;
+      const body = (call.transcript || []).map(t =>
+        `<div class="t-line"><span class="t-role ${t.role}">${t.role === "agent" ? "Agent IA" : "Appelant"}:</span> ${t.text}</div>`
+      ).join("");
+      $("transcriptModalBody").innerHTML = body || '<span style="color:var(--text-tertiary)">Aucune transcription disponible</span>';
+      $("transcriptModal").classList.add("visible");
+    }
+    function closeTranscriptModal() { $("transcriptModal").classList.remove("visible"); }
+    function exportCurrentTranscript() {
+      if (!currentTranscriptData) return;
+      const c = currentTranscriptData;
+      let text = `Transcription — ${c.callerName || "Inconnu"}\nDate: ${c.date}\nNumero: ${c.from}\nIntention: ${c.intent}\nTransfere a: ${c.transferTo}\nSentiment: ${c.sentiment}\nDuree: ${c.duration}s\n\n`;
+      text += (c.transcript || []).map(t => `${t.role === "agent" ? "Agent IA" : "Appelant"}: ${t.text}`).join("\n");
+      downloadText(`transcription_${c.callerName || "appel"}_${new Date(c.date).toISOString().slice(0,10)}.txt`, text);
+    }
+    function downloadText(filename, text) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* ── Simulation ── */
+    let scenarioIdx = 0;
+    $("btnSimulate").addEventListener("click", async () => {
+      if (simulating) return;
+      simulating = true;
+      $("btnSimulate").disabled = true;
+      $("btnSimulate").innerHTML = "&#9654; En cours...";
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelector('[data-view="live"]').classList.add("active");
+      $("view-live").classList.add("active");
+      try { await fetch("/api/simulate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scenario: scenarioIdx++ % 3 }) }); } catch(e) { console.error(e); }
+      setTimeout(() => { simulating = false; $("btnSimulate").disabled = false; $("btnSimulate").innerHTML = "&#9654; Simuler"; }, 8000);
+    });
+
+    /* ── Excel Export ── */
+    async function exportHistoryExcel() {
+      showToast("Preparation de l'export...", "info");
+      try {
+        const res = await fetch("/api/export/history");
+        const data = await res.json();
+        if (!data.length) { showToast("Aucune donnee a exporter", "error"); return; }
+        const rows = data.map(c => ({
+          "Date": new Date(c.date).toLocaleString("fr-FR"),
+          "Numero": c.from || "",
+          "Nom": c.callerName || "Inconnu",
+          "Intention": c.intent || "",
+          "Transfere a": c.transferTo || "",
+          "Duree (s)": c.duration || 0,
+          "Temps qualif. (s)": c.qualificationTime || 0,
+          "Sentiment": c.sentiment || "",
+          "Statut": c.status || "",
+        }));
+        downloadExcel(rows, "Nemra_Historique_Appels");
+        showToast("Historique exporte en Excel", "success");
+      } catch(e) { showToast("Erreur export: " + e.message, "error"); }
+    }
+
+    async function exportCallersExcel() {
+      showToast("Preparation de l'export...", "info");
+      try {
+        const res = await fetch("/api/export/callers");
+        const data = await res.json();
+        if (!data.length) { showToast("Aucun appelant enregistre", "error"); return; }
+        const rows = data.map(c => ({
+          "Telephone": c.phone,
+          "Nom": c.name,
+          "Dernier sujet": c.lastSubject,
+          "Derniere interaction": c.lastDate,
+        }));
+        downloadExcel(rows, "Nemra_Fiches_Appelants");
+        showToast("Fiches appelants exportees en Excel", "success");
+      } catch(e) { showToast("Erreur export: " + e.message, "error"); }
+    }
+
+    async function exportTranscriptionsExcel() {
+      showToast("Preparation de l'export...", "info");
+      try {
+        const res = await fetch("/api/export/transcriptions");
+        const data = await res.json();
+        if (!data.length) { showToast("Aucune transcription disponible", "error"); return; }
+        const rows = data.map(c => ({
+          "Date": new Date(c.date).toLocaleString("fr-FR"),
+          "Numero": c.from || "",
+          "Nom": c.callerName || "Inconnu",
+          "Intention": c.intent || "",
+          "Transfere a": c.transferTo || "",
+          "Sentiment": c.sentiment || "",
+          "Duree (s)": c.duration || 0,
+          "Transcription": c.transcript || "",
+        }));
+        downloadExcel(rows, "Nemra_Transcriptions");
+        showToast("Transcriptions exportees en Excel", "success");
+      } catch(e) { showToast("Erreur export: " + e.message, "error"); }
+    }
+
+    function downloadExcel(rows, filename) {
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      /* Auto column widths */
+      const cols = Object.keys(rows[0]).map(key => {
+        const maxLen = Math.max(key.length, ...rows.map(r => String(r[key] || "").length));
+        return { wch: Math.min(maxLen + 2, 60) };
+      });
+      worksheet["!cols"] = cols;
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Donnees");
+      XLSX.writeFile(workbook, `${filename}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    /* ── Status ── */
     function setStatus(status, text) {
       const dot = $("statusDot");
       dot.className = "status-dot";
@@ -421,6 +635,21 @@
       if (status === "active" || status === "transferring") wf.classList.add("active");
       else wf.classList.remove("active");
     }
+
+    /* ── Sentiment ── */
+    const SENTIMENT_MAP = {
+      positive: { icon: "&#9650;", text: "Positif", cls: "positive" },
+      negative: { icon: "&#9660;", text: "Negatif", cls: "negative" },
+      urgent:   { icon: "&#9888;", text: "Urgent", cls: "urgent" },
+      neutral:  { icon: "&#9679;", text: "Neutre", cls: "neutral" },
+    };
+    function setSentiment(s) {
+      const pill = $("sentimentPill"), info = SENTIMENT_MAP[s] || SENTIMENT_MAP.neutral;
+      pill.className = `sentiment-pill visible ${info.cls}`;
+      $("sentimentIcon").innerHTML = info.icon;
+      $("sentimentText").textContent = info.text;
+    }
+    function hideSentiment() { $("sentimentPill").className = "sentiment-pill"; }
 
     function addTimeline(text, state = "done") {
       const t = $("timeline");
@@ -433,22 +662,14 @@
       const t = $("transcript");
       const empty = t.querySelector(".empty-state");
       if (empty) empty.remove();
-
       if (role === "agent") {
-        if (lastAgentMsg) {
-          lastAgentMsg.querySelector(".text").textContent += " " + text;
-          t.scrollTop = t.scrollHeight;
-          return;
-        }
-        const d = document.createElement("div");
-        d.className = "msg agent";
+        if (lastAgentMsg) { lastAgentMsg.querySelector(".text").textContent += " " + text; t.scrollTop = t.scrollHeight; return; }
+        const d = document.createElement("div"); d.className = "msg agent";
         d.innerHTML = `<div class="label">Agent IA</div><div class="text">${text}</div>`;
-        t.appendChild(d);
-        lastAgentMsg = d;
+        t.appendChild(d); lastAgentMsg = d;
       } else {
         lastAgentMsg = null;
-        const d = document.createElement("div");
-        d.className = "msg user";
+        const d = document.createElement("div"); d.className = "msg user";
         d.innerHTML = `<div class="label">Appelant</div><div class="text">${text}</div>`;
         t.appendChild(d);
       }
@@ -456,73 +677,129 @@
     }
 
     function reset() {
-      $("transcript").innerHTML = `<div class="empty-state"><div class="empty-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring-dot"></div></div><div class="empty-text">Le standard IA attend un appel.<br><span class="phone">+1 510 443-8339</span></div></div>`;
-      $("callerNumber").textContent = "--";
-      $("callerInfo").textContent = "";
+      $("transcript").innerHTML = `<div class="empty-state"><div class="empty-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring-dot"></div></div><div class="empty-text">Le standard IA attend un appel.<br>Cliquez <strong>Simuler</strong> pour une demo.</div></div>`;
+      $("callerNumber").textContent = "--"; $("callerInfo").textContent = "";
       $("returningCaller").innerHTML = `<span class="s-card-sub">Aucune donnee</span>`;
       $("intentArea").innerHTML = `<span class="s-card-sub">En ecoute...</span>`;
       $("transferArea").innerHTML = `<span class="s-card-sub">--</span>`;
-      $("timeline").innerHTML = "";
-      $("duration").textContent = "0:00";
-      lastAgentMsg = null;
+      $("timeline").innerHTML = ""; $("duration").textContent = "0:00";
+      lastAgentMsg = null; hideSentiment();
       if (durationInterval) clearInterval(durationInterval);
     }
 
+    /* ── Analytics ── */
+    function updateStats(stats) {
+      $("statTotal").textContent = stats.total;
+      $("statToday").textContent = stats.today;
+      $("statWeek").textContent = stats.thisWeek;
+      $("statSuccess").textContent = stats.successRate + "%";
+      $("statAvgDuration").textContent = stats.avgDuration + "s";
+      $("statAvgQualif").textContent = stats.avgQualificationTime + "s";
+      $("totalBadge").textContent = stats.total;
+      renderDonut(stats.byAgent);
+      renderSentimentBars(stats.sentiments);
+      renderAgents(stats.byAgent);
+    }
+
+    function renderDonut(byAgent) {
+      const total = (byAgent.oumaima||0)+(byAgent.ghali||0)+(byAgent.zineb||0)+(byAgent.end_call||0);
+      if (!total) { $("donutChart").innerHTML = '<circle cx="21" cy="21" r="15.9" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>'; $("donutLegend").innerHTML = '<span style="font-size:.72rem;color:var(--text-tertiary)">Aucune donnee</span>'; return; }
+      const data = [{name:"Oumaima",value:byAgent.oumaima||0,color:"#9B8EC4"},{name:"Ghali",value:byAgent.ghali||0,color:"#D4A843"},{name:"Zineb",value:byAgent.zineb||0,color:"#B8A0D6"},{name:"Raccroches",value:byAgent.end_call||0,color:"#564e68"}].filter(d=>d.value>0);
+      let offset = 25, svg = '<circle cx="21" cy="21" r="15.9" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="5"/>';
+      for (const d of data) { const pct = (d.value/total)*100; svg += `<circle cx="21" cy="21" r="15.9" fill="none" stroke="${d.color}" stroke-width="5" stroke-dasharray="${pct} ${100-pct}" stroke-dashoffset="${offset}" stroke-linecap="round"/>`; offset -= pct; }
+      $("donutChart").innerHTML = svg;
+      $("donutLegend").innerHTML = data.map(d=>`<div class="donut-legend-item"><div class="donut-legend-dot" style="background:${d.color}"></div><span>${d.name}</span><span style="color:var(--text-tertiary);margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.68rem">${d.value}</span></div>`).join("");
+    }
+
+    function renderSentimentBars(s) {
+      const max = Math.max(s.positive||0, s.neutral||0, s.negative||0, s.urgent||0, 1);
+      const data = [{label:"Positif",value:s.positive||0,cls:"accent"},{label:"Neutre",value:s.neutral||0,cls:"blue"},{label:"Negatif",value:s.negative||0,cls:"amber"},{label:"Urgent",value:s.urgent||0,cls:"purple"}];
+      $("sentimentChart").innerHTML = data.map(d=>`<div class="bar-row"><span class="bar-label">${d.label}</span><div class="bar-track"><div class="bar-fill ${d.cls}" style="width:${(d.value/max)*100}%">${d.value||""}</div></div></div>`).join("");
+    }
+
+    function renderAgents(byAgent) {
+      const now = new Date(), day = now.getDay(), hour = now.getHours();
+      const agents = [
+        {key:"oumaima",name:"Oumaima",role:"Commercial & visites",available:day>=1&&day<=5&&hour>=9&&hour<18,calls:byAgent.oumaima||0},
+        {key:"ghali",name:"Ghali",role:"Partenariats & direction",available:day>=1&&day<=5&&hour>=10&&hour<19,calls:byAgent.ghali||0},
+        {key:"zineb",name:"Zineb",role:"Support clients",available:day>=1&&day<=6&&hour>=9&&hour<20,calls:byAgent.zineb||0},
+      ];
+      $("agentsGrid").innerHTML = agents.map(a=>`<div class="agent-row">
+        <div class="agent-avatar ${a.key}">${a.name[0]}</div>
+        <div class="agent-info"><div class="agent-name">${a.name}</div><div class="agent-role">${a.role} &middot; ${a.calls} appels</div></div>
+        <button class="agent-msg-btn" onclick="openModal('${a.key}')" title="Envoyer un SMS">&#9993;</button>
+        <div class="agent-status-badge ${a.available?'available':'offline'}">${a.available?'Dispo':'Absent'}</div>
+      </div>`).join("");
+    }
+
+    /* ── History ── */
+    let historyData = [];
+    function updateHistory(history) {
+      historyData = history || [];
+      if (!historyData.length) { $("historyList").innerHTML = '<div class="no-history">Aucun appel enregistre</div>'; return; }
+      $("historyList").innerHTML = historyData.map((c, i) => {
+        const d = new Date(c.date);
+        const dateStr = d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+        const dur = c.duration ? `${Math.floor(c.duration/60)}:${String(c.duration%60).padStart(2,"0")}` : "--";
+        const sentiment = c.sentiment||"neutral";
+        const sentLabel = {positive:"Positif",negative:"Negatif",urgent:"Urgent",neutral:"Neutre"}[sentiment]||sentiment;
+        return `<div class="history-item" onclick="openTranscriptModal(historyData[${i}])">
+          <span class="hi-date">${dateStr}</span>
+          <span class="hi-caller">${c.callerName||c.from||"Inconnu"}</span>
+          <span class="hi-intent">${c.intent||"--"}</span>
+          <span class="hi-target">${c.transferTo||"--"}</span>
+          <span class="hi-duration">${dur}</span>
+          <span class="hi-sentiment ${sentiment}">${sentLabel}</span>
+          <span class="hi-expand">&#9662;</span>
+        </div>`;
+      }).join("");
+    }
+
+    /* ── WebSocket ── */
     ws.onmessage = (e) => {
       const msg = JSON.parse(e.data);
-
       switch (msg.type) {
         case "call_start":
-          reset();
-          callActive = true;
-          callStartTime = Date.now();
+          reset(); callActive = true; callStartTime = Date.now();
           $("callerNumber").textContent = msg.from || "Inconnu";
-          setStatus("active", "Appel en cours");
+          setStatus("active", "Appel en cours"); setSentiment("neutral");
           addTimeline("Appel recu", "done");
-          durationInterval = setInterval(() => {
-            const s = Math.round((Date.now() - callStartTime) / 1000);
-            $("duration").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-          }, 1000);
+          durationInterval = setInterval(() => { const s = Math.round((Date.now()-callStartTime)/1000); $("duration").textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }, 1000);
+          document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+          document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+          document.querySelector('[data-view="live"]').classList.add("active");
+          $("view-live").classList.add("active");
           break;
-
-        case "transcript":
-          addMsg(msg.role, msg.text);
-          break;
-
+        case "transcript": addMsg(msg.role, msg.text); break;
+        case "sentiment": setSentiment(msg.sentiment); break;
         case "returning_caller":
           $("returningCaller").innerHTML = `<div class="returning"><div class="name">${msg.name}</div><div class="detail">Dernier appel : ${msg.lastDate}<br>${msg.lastSubject}</div></div>`;
-          addTimeline(`Appelant reconnu : ${msg.name}`, "done");
-          break;
-
+          addTimeline(`Reconnu : ${msg.name}`, "done"); break;
         case "intent":
-          $("intentArea").innerHTML = `<span class="intent-badge">${msg.intent}</span>` + (msg.target ? `<div class="s-card-sub" style="margin-top:.5rem">Vers ${msg.target}</div>` : "");
-          addTimeline(`Intention : ${msg.intent}`, "done");
-          break;
-
+          $("intentArea").innerHTML = `<span class="intent-badge">${msg.intent}</span>`+(msg.target?`<div class="s-card-sub" style="margin-top:.35rem">Vers ${msg.target}</div>`:"");
+          addTimeline(`Intention : ${msg.intent}`, "done"); break;
         case "transfer":
           $("transferArea").innerHTML = `<div class="transfer-card"><div class="name">${msg.target}</div><div class="role">${msg.role}</div><div class="number">${msg.number}</div></div>`;
-          addTimeline(`Transfert vers ${msg.target}`, "active");
-          break;
-
+          addTimeline(`Transfert vers ${msg.target}`, "active"); break;
         case "status":
-          if (msg.status === "transferring") setStatus("transferring", "Transfert en cours...");
-          else if (msg.status === "transferred") { setStatus("active", "Transfere"); addTimeline("Transfert reussi", "done"); }
-          else if (msg.status === "transfer_failed") { setStatus("active", "Echec transfert"); addTimeline("Transfert echoue", "error"); }
-          else if (msg.status === "ended") setStatus("active", "Appel termine");
+          if (msg.status==="transferring") setStatus("transferring","Transfert...");
+          else if (msg.status==="transferred") { setStatus("active","Transfere"); addTimeline("Transfert OK","done"); }
+          else if (msg.status==="transfer_failed") { setStatus("active","Echec"); addTimeline("Transfert echoue","error"); }
+          else if (msg.status==="ended") setStatus("active","Termine");
           break;
-
         case "call_end":
-          callActive = false;
-          if (durationInterval) clearInterval(durationInterval);
-          $("duration").textContent = `${Math.floor(msg.duration / 60)}:${String(msg.duration % 60).padStart(2, "0")}`;
-          setStatus("", `Termine (${msg.duration}s)`);
-          addTimeline("Appel termine", "done");
-          break;
+          callActive = false; if(durationInterval)clearInterval(durationInterval);
+          $("duration").textContent = `${Math.floor(msg.duration/60)}:${String(msg.duration%60).padStart(2,"0")}`;
+          setStatus("",`Termine (${msg.duration}s)`); addTimeline("Appel termine","done");
+          setTimeout(hideSentiment, 3000); break;
+        case "stats_update": updateStats(msg.stats); break;
+        case "history_update": updateHistory(msg.history); break;
+        case "alert_sent":
+          showToast(`SMS envoye a ${msg.target}: "${msg.message.slice(0,50)}..."`, "success"); break;
       }
     };
-
-    ws.onclose = () => setStatus("", "Deconnecte du serveur");
-    ws.onerror = () => setStatus("", "Erreur de connexion");
+    ws.onclose = () => setStatus("", "Deconnecte");
+    ws.onerror = () => setStatus("", "Erreur connexion");
   </script>
 </body>
 </html>

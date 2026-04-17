@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nemra 06 — Connexion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0814;
+      --glass: rgba(18, 14, 32, 0.55);
+      --glass-border: rgba(255,255,255,0.06);
+      --accent: #9B8EC4;
+      --accent-dim: rgba(155, 142, 196, 0.12);
+      --accent-glow: rgba(155, 142, 196, 0.3);
+      --gold: #D4A843;
+      --gold-dim: rgba(212, 168, 67, 0.12);
+      --red: #e05275;
+      --text: #ede8f4;
+      --text-secondary: #8a7f99;
+      --text-tertiary: #564e68;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 30%, rgba(155,142,196,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 70% 70%, rgba(212,168,67,0.04) 0%, transparent 70%);
+    }
+    .login-card {
+      position: relative; z-index: 1;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 2.5rem 2.5rem 2rem;
+      width: 380px;
+      max-width: 90vw;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .login-logo img {
+      height: 60px;
+      filter: brightness(1.1);
+    }
+    .login-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+    .field {
+      margin-bottom: 1rem;
+    }
+    .field label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: .4rem;
+    }
+    .field input {
+      width: 100%;
+      padding: .7rem .9rem;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      transition: border-color .2s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .btn-login {
+      width: 100%;
+      padding: .75rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #B8A0D6);
+      color: #0a0814;
+      font-family: 'Outfit', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: .5rem;
+    }
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login:disabled { opacity: 0.5; pointer-events: none; }
+    .error-msg {
+      color: var(--red);
+      font-size: .8rem;
+      text-align: center;
+      margin-top: .75rem;
+      min-height: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="/logo.png" alt="Nemra 06">
+    </div>
+    <div class="login-title">Standard IA — Connexion</div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="admin@nemra.ma" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-login" id="btnLogin">Se connecter</button>
+      <div class="error-msg" id="errorMsg"></div>
+    </form>
+  </div>
+  <script>
+    if (localStorage.getItem("nemra_token")) {
+      window.location.href = "/dashboard";
+    }
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btnLogin");
+      const err = document.getElementById("errorMsg");
+      btn.disabled = true;
+      btn.textContent = "Connexion...";
+      err.textContent = "";
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.error || "Erreur"; btn.disabled = false; btn.textContent = "Se connecter"; return; }
+        localStorage.setItem("nemra_token", data.token);
+        localStorage.setItem("nemra_user", JSON.stringify(data.user));
+        window.location.href = "/dashboard";
+      } catch(e) {
+        err.textContent = "Erreur reseau";
+        btn.disabled = false;
+        btn.textContent = "Se connecter";
+      }
+    });
+  </script>
+</body>
+</html>

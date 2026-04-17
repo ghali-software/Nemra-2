@@ -4,3 +4,8 @@ node_modules
 .gitignore
 fly.toml
 Dockerfile
+nemra.db
+nemra.db-wal
+nemra.db-shm
+call-history.json
+callers.json

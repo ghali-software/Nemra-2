@@ -2,3 +2,7 @@ node_modules
 .env
 *.log
 callers.json
+call-history.json
+nemra.db
+nemra.db-wal
+nemra.db-shm

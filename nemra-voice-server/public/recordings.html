@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nemra 06 — Enregistrements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0814; --surface-solid: #110d1c;
+      --glass: rgba(18, 14, 32, 0.55); --glass-border: rgba(255,255,255,0.06); --glass-border-hover: rgba(255,255,255,0.12);
+      --accent: #9B8EC4; --accent-dim: rgba(155, 142, 196, 0.12); --accent-glow: rgba(155, 142, 196, 0.3);
+      --gold: #D4A843; --gold-dim: rgba(212, 168, 67, 0.12);
+      --red: #e05275; --red-dim: rgba(224, 82, 117, 0.1);
+      --green: #6dc98f; --green-dim: rgba(109, 201, 143, 0.1);
+      --text: #ede8f4; --text-secondary: #8a7f99; --text-tertiary: #564e68;
+      --radius-sm: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    .bg-mesh { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 60% 50% at 15% 20%, rgba(155,142,196,0.05) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 85% 80%, rgba(212,168,67,0.04) 0%, transparent 70%); }
+
+    .top-bar { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: .65rem 1.5rem; border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); background: var(--glass); }
+    .logo-img { height: 70px; filter: brightness(1.1); }
+    .top-bar-right { display: flex; align-items: center; gap: .75rem; }
+    .user-info { font-size: .78rem; color: var(--text-secondary); }
+    .user-info strong { color: var(--accent); }
+    .nav-links { display: flex; gap: .4rem; }
+    .nav-link { padding: .35rem .75rem; border-radius: 8px; font-size: .72rem; font-weight: 600; text-decoration: none; border: 1px solid var(--glass-border); color: var(--text-secondary); background: var(--glass); transition: all .2s; }
+    .nav-link:hover { border-color: var(--glass-border-hover); color: var(--text); }
+    .nav-link.active { border-color: rgba(155,142,196,0.3); color: var(--accent); background: var(--accent-dim); }
+    .btn { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .75rem; border-radius: 8px; font-size: .72rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .2s; border: 1px solid; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-accent { border-color: rgba(155,142,196,0.2); background: var(--accent-dim); color: var(--accent); }
+    .btn-gold { border-color: rgba(212,168,67,0.2); background: var(--gold-dim); color: var(--gold); }
+    .btn-logout { padding: .3rem .6rem; border-radius: 7px; font-size: .65rem; font-weight: 600; cursor: pointer; border: 1px solid rgba(224,82,117,0.2); background: rgba(224,82,117,0.06); color: #e05275; font-family: 'DM Sans', sans-serif; }
+
+    /* Layout */
+    .content { position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1.5rem; border-bottom: 1px solid var(--glass-border); }
+    .page-title { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; }
+    .filters { display: flex; gap: .4rem; }
+    .filter-btn { padding: .3rem .65rem; border-radius: 7px; font-size: .68rem; font-weight: 600; cursor: pointer; border: 1px solid var(--glass-border); background: transparent; color: var(--text-secondary); font-family: 'DM Sans', sans-serif; transition: all .2s; }
+    .filter-btn:hover { border-color: var(--glass-border-hover); color: var(--text); }
+    .filter-btn.active { border-color: rgba(155,142,196,0.3); color: var(--accent); background: var(--accent-dim); }
+
+    .main-area { flex: 1; display: flex; overflow: hidden; }
+
+    /* Left: recording list */
+    .rec-list { width: 420px; min-width: 320px; border-right: 1px solid var(--glass-border); overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.06) transparent; }
+    .rec-header { display: grid; grid-template-columns: 130px 1fr 70px 60px; gap: .5rem; padding: .4rem 1rem; font-family: 'Outfit', sans-serif; font-size: .52rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); border-bottom: 1px solid var(--glass-border); }
+    .rec-item { display: grid; grid-template-columns: 130px 1fr 70px 60px; gap: .5rem; padding: .55rem 1rem; align-items: center; font-size: .78rem; border-bottom: 1px solid rgba(255,255,255,0.02); cursor: pointer; transition: background .15s; }
+    .rec-item:hover { background: rgba(255,255,255,0.02); }
+    .rec-item.selected { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+    .rec-item .ri-date { font-family: 'JetBrains Mono', monospace; font-size: .67rem; color: var(--text-secondary); }
+    .rec-item .ri-sid { font-family: 'JetBrains Mono', monospace; font-size: .65rem; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rec-item .ri-dur { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--text-secondary); }
+    .rec-item .ri-status { font-size: .62rem; font-weight: 600; }
+    .rec-item .ri-status.ready { color: var(--green); }
+    .rec-item .ri-status.failed { color: var(--red); }
+    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--text-tertiary); font-size: .85rem; gap: .5rem; padding: 2rem; text-align: center; }
+
+    /* Right: player + transcript */
+    .player-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .player-empty { display: flex; align-items: center; justify-content: center; flex: 1; color: var(--text-tertiary); font-size: .85rem; }
+    .player-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; display: none; }
+    .player-view.active { display: flex; }
+
+    .player-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); }
+    .player-title { font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 600; margin-bottom: .6rem; }
+    .player-meta { display: flex; gap: 1.5rem; font-size: .72rem; color: var(--text-secondary); }
+    .player-meta .label { color: var(--text-tertiary); font-size: .6rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .15rem; }
+    .player-meta .value { font-family: 'JetBrains Mono', monospace; }
+
+    .audio-controls { padding: .75rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 1rem; }
+    .audio-controls audio { flex: 1; height: 36px; }
+    .speed-btns { display: flex; gap: .25rem; }
+    .speed-btn { padding: .2rem .45rem; border-radius: 5px; font-size: .65rem; font-weight: 600; cursor: pointer; border: 1px solid var(--glass-border); background: transparent; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; transition: all .2s; }
+    .speed-btn:hover { border-color: var(--glass-border-hover); color: var(--text); }
+    .speed-btn.active { border-color: rgba(155,142,196,0.3); color: var(--accent); background: var(--accent-dim); }
+
+    .transcript-area { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: .5rem; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.06) transparent; }
+    .t-msg { max-width: 80%; padding: .5rem .8rem; border-radius: var(--radius-sm); font-size: .82rem; line-height: 1.5; }
+    .t-msg.user { align-self: flex-start; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-bottom-left-radius: 3px; }
+    .t-msg.agent { align-self: flex-end; background: linear-gradient(135deg, rgba(155,142,196,0.1), rgba(212,168,67,0.08)); border: 1px solid rgba(155,142,196,0.12); border-bottom-right-radius: 3px; }
+    .t-msg .t-label { font-family: 'Outfit', sans-serif; font-size: .52rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; margin-bottom: .15rem; }
+    .t-msg.user .t-label { color: var(--text-tertiary); }
+    .t-msg.agent .t-label { color: var(--accent); }
+    .t-empty { color: var(--text-tertiary); font-size: .8rem; text-align: center; padding: 2rem; }
+
+    .player-footer { padding: .6rem 1.5rem; border-top: 1px solid var(--glass-border); display: flex; gap: .5rem; justify-content: flex-end; }
+
+    .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: .4rem; }
+    .toast { padding: .6rem 1rem; border-radius: 8px; font-size: .78rem; font-weight: 500; animation: toastIn .4s ease, toastOut .4s ease 4s forwards; max-width: 350px; }
+    .toast.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(109,201,143,0.2); }
+    .toast.error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,82,117,0.2); }
+    .toast.info { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(155,142,196,0.2); }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+    @media (max-width: 900px) {
+      .main-area { flex-direction: column; }
+      .rec-list { width: 100%; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--glass-border); }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+  <div class="toast-container" id="toasts"></div>
+
+  <div class="top-bar">
+    <a href="/dashboard"><img src="/logo.png" alt="Nemra 06" class="logo-img"></a>
+    <div class="top-bar-right">
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/recordings" class="nav-link active">Enregistrements</a>
+        <a href="/users" class="nav-link" id="navUsers" style="display:none">Employes</a>
+      </div>
+      <div class="user-info"><strong id="userName"></strong> <span id="userRole"></span></div>
+      <button class="btn-logout" onclick="logout()">Deconnexion</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="toolbar">
+      <div class="page-title">Enregistrements</div>
+      <div class="filters">
+        <button class="filter-btn active" data-days="all" onclick="setFilter(this)">Tous</button>
+        <button class="filter-btn" data-days="1" onclick="setFilter(this)">Aujourd'hui</button>
+        <button class="filter-btn" data-days="7" onclick="setFilter(this)">7 jours</button>
+        <button class="filter-btn" data-days="30" onclick="setFilter(this)">30 jours</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="rec-list">
+        <div class="rec-header">
+          <span>Date</span><span>CallSid</span><span>Duree</span><span>Statut</span>
+        </div>
+        <div id="recList"><div class="empty">Chargement...</div></div>
+      </div>
+
+      <div class="player-area">
+        <div class="player-empty" id="playerEmpty">Selectionnez un enregistrement pour l'ecouter</div>
+        <div class="player-view" id="playerView">
+          <div class="player-header">
+            <div class="player-title" id="playerTitle">Enregistrement</div>
+            <div class="player-meta">
+              <div><div class="label">CallSid</div><div class="value" id="playerSid"></div></div>
+              <div><div class="label">Duree</div><div class="value" id="playerDur"></div></div>
+              <div><div class="label">Channels</div><div class="value" id="playerCh"></div></div>
+              <div><div class="label">Date</div><div class="value" id="playerDate"></div></div>
+            </div>
+          </div>
+
+          <div class="audio-controls">
+            <audio controls id="audioPlayer"></audio>
+            <div class="speed-btns">
+              <button class="speed-btn" onclick="setSpeed(0.5)">0.5x</button>
+              <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+              <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
+              <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+            </div>
+          </div>
+
+          <div class="transcript-area" id="transcriptArea">
+            <div class="t-empty">Aucune transcription liee a cet enregistrement.<br>La liaison sera disponible dans un sprint futur.</div>
+          </div>
+
+          <div class="player-footer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("nemra_token");
+    const currentUser = JSON.parse(localStorage.getItem("nemra_user") || "null");
+    if (!token || !currentUser) { window.location.href = "/login.html"; }
+    if (!["admin", "supervisor"].includes(currentUser?.role)) {
+      document.querySelector(".content").innerHTML = '<div class="empty" style="flex:1">Acces reserve aux administrateurs et superviseurs.</div>';
+    }
+    document.getElementById("userName").textContent = currentUser?.firstName || currentUser?.email || "";
+    document.getElementById("userRole").textContent = `(${currentUser?.role || ""})`;
+    if (currentUser?.role === "admin") { const nu = document.getElementById("navUsers"); if (nu) nu.style.display = ""; }
+
+    function logout() { localStorage.removeItem("nemra_token"); localStorage.removeItem("nemra_user"); window.location.href = "/login.html"; }
+    function showToast(msg, type = "info") { const t = document.createElement("div"); t.className = `toast ${type}`; t.textContent = msg; document.getElementById("toasts").appendChild(t); setTimeout(() => t.remove(), 4500); }
+
+    const api = (path) => fetch(`/api${path}`, { headers: { Authorization: `Bearer ${token}` } });
+    let recordings = [];
+    let currentFilter = "all";
+    let selectedRec = null;
+
+    function setFilter(el) {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      el.classList.add("active");
+      currentFilter = el.dataset.days;
+      loadRecordings();
+    }
+
+    async function loadRecordings() {
+      if (!["admin", "supervisor"].includes(currentUser?.role)) return;
+      try {
+        const url = currentFilter === "all" ? "/recordings" : `/recordings?days=${currentFilter}`;
+        const res = await api(url);
+        if (res.status === 401) { logout(); return; }
+        recordings = await res.json();
+        renderList();
+      } catch (e) { showToast("Erreur chargement", "error"); }
+    }
+
+    function renderList() {
+      const el = document.getElementById("recList");
+      if (!recordings.length) {
+        el.innerHTML = '<div class="empty">Aucun enregistrement disponible.<br><span style="font-size:.75rem;color:var(--text-tertiary)">Les enregistrements apparaitront ici une fois que l\'enregistrement Twilio sera active dans la console.</span></div>';
+        return;
+      }
+      el.innerHTML = recordings.map((r, i) => {
+        const d = new Date(r.created_at + "Z");
+        const dateStr = d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+        const dur = `${Math.floor(r.duration_seconds / 60)}:${String(r.duration_seconds % 60).padStart(2, "0")}`;
+        const sidShort = r.call_sid ? r.call_sid.slice(0, 16) + "..." : "—";
+        return `<div class="rec-item ${selectedRec?.id === r.id ? 'selected' : ''}" onclick="selectRec(${i})">
+          <span class="ri-date">${dateStr}</span>
+          <span class="ri-sid" title="${r.call_sid}">${sidShort}</span>
+          <span class="ri-dur">${dur}</span>
+          <span class="ri-status ${r.status}">${r.status === 'ready' ? 'Pret' : r.status}</span>
+        </div>`;
+      }).join("");
+    }
+
+    function selectRec(idx) {
+      selectedRec = recordings[idx];
+      renderList();
+
+      document.getElementById("playerEmpty").style.display = "none";
+      document.getElementById("playerView").classList.add("active");
+
+      const d = new Date(selectedRec.created_at + "Z");
+      document.getElementById("playerTitle").textContent = `Enregistrement — ${d.toLocaleDateString("fr-FR")}`;
+      document.getElementById("playerSid").textContent = selectedRec.call_sid;
+      document.getElementById("playerDur").textContent = `${selectedRec.duration_seconds}s`;
+      document.getElementById("playerCh").textContent = selectedRec.channels === 2 ? "Dual" : "Mono";
+      document.getElementById("playerDate").textContent = d.toLocaleString("fr-FR");
+
+      // Stream via server proxy (handles Twilio auth + range requests)
+      const audioUrl = `/api/recordings/${selectedRec.id}/stream?token=${encodeURIComponent(token)}`;
+      const player = document.getElementById("audioPlayer");
+      player.src = audioUrl;
+      player.playbackRate = 1;
+      document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector('.speed-btn[onclick="setSpeed(1)"]').classList.add("active");
+
+      // Transcript placeholder
+      document.getElementById("transcriptArea").innerHTML = '<div class="t-empty">Aucune transcription liee a cet enregistrement.<br><span style="font-size:.72rem">La liaison call_sid sera disponible dans un sprint futur.</span></div>';
+    }
+
+    function setSpeed(rate) {
+      document.getElementById("audioPlayer").playbackRate = rate;
+      document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(`.speed-btn[onclick="setSpeed(${rate})"]`).classList.add("active");
+    }
+
+    loadRecordings();
+  </script>
+</body>
+</html>

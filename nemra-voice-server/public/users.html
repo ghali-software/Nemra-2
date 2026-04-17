@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nemra 06 — Gestion Employes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0814; --surface-solid: #110d1c;
+      --glass: rgba(18, 14, 32, 0.55); --glass-border: rgba(255,255,255,0.06); --glass-border-hover: rgba(255,255,255,0.12);
+      --accent: #9B8EC4; --accent-dim: rgba(155, 142, 196, 0.12); --accent-glow: rgba(155, 142, 196, 0.3);
+      --gold: #D4A843; --gold-dim: rgba(212, 168, 67, 0.12);
+      --red: #e05275; --red-dim: rgba(224, 82, 117, 0.1);
+      --green: #6dc98f; --green-dim: rgba(109, 201, 143, 0.1);
+      --text: #ede8f4; --text-secondary: #8a7f99; --text-tertiary: #564e68;
+      --radius-sm: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    .bg-mesh { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 60% 50% at 15% 20%, rgba(155,142,196,0.05) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 85% 80%, rgba(212,168,67,0.04) 0%, transparent 70%); }
+
+    /* Header */
+    .top-bar { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: .65rem 1.5rem; border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); background: var(--glass); }
+    .logo-img { height: 70px; filter: brightness(1.1); }
+    .top-bar-right { display: flex; align-items: center; gap: .75rem; }
+    .user-info { font-size: .78rem; color: var(--text-secondary); }
+    .user-info strong { color: var(--accent); }
+    .nav-links { display: flex; gap: .4rem; }
+    .nav-link { padding: .35rem .75rem; border-radius: 8px; font-size: .72rem; font-weight: 600; text-decoration: none; border: 1px solid var(--glass-border); color: var(--text-secondary); background: var(--glass); transition: all .2s; }
+    .nav-link:hover { border-color: var(--glass-border-hover); color: var(--text); }
+    .nav-link.active { border-color: rgba(155,142,196,0.3); color: var(--accent); background: var(--accent-dim); }
+    .btn { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .75rem; border-radius: 8px; font-size: .72rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .2s; border: 1px solid; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-accent { border-color: rgba(155,142,196,0.2); background: linear-gradient(135deg, rgba(155,142,196,0.1), rgba(212,168,67,0.08)); color: var(--accent); }
+    .btn-red { border-color: rgba(224,82,117,0.2); background: var(--red-dim); color: var(--red); }
+    .btn-gold { border-color: rgba(212,168,67,0.2); background: var(--gold-dim); color: var(--gold); }
+    .btn-logout { border-color: rgba(224,82,117,0.2); background: var(--red-dim); color: var(--red); }
+
+    /* Content */
+    .content { position: relative; z-index: 10; max-width: 1000px; margin: 1.5rem auto; padding: 0 1.5rem; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .page-title { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; }
+
+    /* Table */
+    .table-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); overflow: hidden; }
+    .table-header { display: grid; grid-template-columns: 50px 1fr 1fr 100px 130px 80px 120px; gap: .5rem; padding: .5rem 1rem; font-family: 'Outfit', sans-serif; font-size: .55rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); border-bottom: 1px solid var(--glass-border); }
+    .table-row { display: grid; grid-template-columns: 50px 1fr 1fr 100px 130px 80px 120px; gap: .5rem; padding: .6rem 1rem; align-items: center; font-size: .8rem; border-bottom: 1px solid rgba(255,255,255,0.02); transition: background .15s; }
+    .table-row:hover { background: rgba(255,255,255,0.02); }
+    .table-row:last-child { border-bottom: none; }
+    .table-row .id { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--text-tertiary); }
+    .table-row .email { color: var(--accent); font-weight: 500; }
+    .table-row .name { color: var(--text); }
+    .role-badge { display: inline-flex; padding: .15rem .45rem; border-radius: 5px; font-size: .65rem; font-weight: 600; }
+    .role-badge.admin { background: var(--gold-dim); color: var(--gold); }
+    .role-badge.supervisor { background: var(--accent-dim); color: var(--accent); }
+    .role-badge.agent { background: rgba(255,255,255,0.04); color: var(--text-secondary); }
+    .status-dot { display: inline-flex; align-items: center; gap: .3rem; font-size: .7rem; }
+    .status-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot.active::before { background: var(--green); box-shadow: 0 0 6px rgba(109,201,143,0.4); }
+    .status-dot.inactive::before { background: var(--red); }
+    .actions { display: flex; gap: .3rem; }
+    .actions button { padding: .2rem .45rem; border-radius: 5px; font-size: .6rem; font-weight: 600; cursor: pointer; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); color: var(--text-secondary); transition: all .2s; }
+    .actions button:hover { border-color: var(--glass-border-hover); color: var(--text); }
+    .actions button.del:hover { border-color: rgba(224,82,117,0.3); color: var(--red); }
+    .empty { text-align: center; padding: 2rem; color: var(--text-tertiary); font-size: .85rem; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; }
+    .modal-overlay.visible { display: flex; }
+    .modal { background: var(--surface-solid); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; width: 440px; max-width: 90vw; animation: modalIn .3s ease; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+    .modal-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 1.2rem; }
+    .modal-field { margin-bottom: .7rem; }
+    .modal-field label { display: block; font-size: .65rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .25rem; }
+    .modal-field input, .modal-field select { width: 100%; padding: .55rem .75rem; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; }
+    .modal-field input:focus, .modal-field select:focus { outline: none; border-color: var(--accent); }
+    .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .modal-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1.2rem; }
+    .password-reveal { margin-top: 1rem; padding: 1rem; border-radius: 8px; background: var(--gold-dim); border: 1px solid rgba(212,168,67,0.2); text-align: center; }
+    .password-reveal .label { font-size: .7rem; color: var(--gold); font-weight: 600; margin-bottom: .4rem; }
+    .password-reveal .pwd { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; color: var(--gold); font-weight: 700; letter-spacing: .1em; user-select: all; }
+
+    .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: .4rem; }
+    .toast { padding: .6rem 1rem; border-radius: 8px; font-size: .78rem; font-weight: 500; animation: toastIn .4s ease, toastOut .4s ease 4s forwards; max-width: 350px; }
+    .toast.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(109,201,143,0.2); }
+    .toast.error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,82,117,0.2); }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+  <div class="toast-container" id="toasts"></div>
+
+  <!-- Create / Edit Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal">
+      <div class="modal-title" id="modalTitle">Ajouter un employe</div>
+      <input type="hidden" id="editId">
+      <div class="modal-row">
+        <div class="modal-field"><label>Prenom</label><input type="text" id="mFirstName" placeholder="Prenom"></div>
+        <div class="modal-field"><label>Nom</label><input type="text" id="mLastName" placeholder="Nom"></div>
+      </div>
+      <div class="modal-field"><label>Email</label><input type="email" id="mEmail" placeholder="email@nemra.ma"></div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Role</label><select id="mRole"><option value="agent">Agent</option><option value="supervisor">Superviseur</option><option value="admin">Admin</option></select></div>
+        <div class="modal-field"><label>Telephone</label><input type="tel" id="mPhone" placeholder="+212..."></div>
+      </div>
+      <div class="password-reveal" id="pwdReveal" style="display:none">
+        <div class="label">Mot de passe genere</div>
+        <div class="pwd" id="pwdValue"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-red" onclick="closeModal()">Annuler</button>
+        <button class="btn btn-accent" id="btnSave" onclick="saveUser()">Creer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Reset Modal -->
+  <div class="modal-overlay" id="resetModal">
+    <div class="modal">
+      <div class="modal-title">Nouveau mot de passe</div>
+      <div class="password-reveal">
+        <div class="label">Mot de passe genere</div>
+        <div class="pwd" id="resetPwdValue"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-accent" onclick="document.getElementById('resetModal').classList.remove('visible')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <a href="/dashboard"><img src="/logo.png" alt="Nemra 06" class="logo-img"></a>
+    <div class="top-bar-right">
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/users" class="nav-link active">Employes</a>
+      </div>
+      <div class="user-info"><strong id="userName"></strong> <span id="userRole"></span></div>
+      <button class="btn btn-logout" onclick="logout()">Deconnexion</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="page-title">Gestion des employes</div>
+      <button class="btn btn-accent" onclick="openCreate()">+ Ajouter</button>
+    </div>
+    <div class="table-card">
+      <div class="table-header">
+        <span>#</span><span>Email</span><span>Nom</span><span>Role</span><span>Telephone</span><span>Statut</span><span>Actions</span>
+      </div>
+      <div id="userList"><div class="empty">Chargement...</div></div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("nemra_token");
+    const currentUser = JSON.parse(localStorage.getItem("nemra_user") || "{}");
+    if (!token) window.location.href = "/login.html";
+    if (currentUser.role !== "admin") { document.querySelector(".content").innerHTML = '<div class="empty" style="margin-top:3rem">Acces reserve aux administrateurs.</div>'; }
+
+    document.getElementById("userName").textContent = currentUser.firstName || currentUser.email;
+    document.getElementById("userRole").textContent = `(${currentUser.role})`;
+
+    const api = (path, opts = {}) => fetch(`/api${path}`, { ...opts, headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`, ...opts.headers } });
+
+    function showToast(msg, type = "success") {
+      const t = document.createElement("div"); t.className = `toast ${type}`; t.textContent = msg;
+      document.getElementById("toasts").appendChild(t); setTimeout(() => t.remove(), 4500);
+    }
+
+    function logout() { localStorage.removeItem("nemra_token"); localStorage.removeItem("nemra_user"); window.location.href = "/login.html"; }
+
+    async function loadUsers() {
+      if (currentUser.role !== "admin") return;
+      try {
+        const res = await api("/users");
+        if (res.status === 401) { logout(); return; }
+        const users = await res.json();
+        const list = document.getElementById("userList");
+        if (!users.length) { list.innerHTML = '<div class="empty">Aucun employe</div>'; return; }
+        list.innerHTML = users.map(u => `
+          <div class="table-row">
+            <span class="id">${u.id}</span>
+            <span class="email">${u.email}</span>
+            <span class="name">${u.first_name} ${u.last_name}</span>
+            <span><span class="role-badge ${u.role}">${u.role}</span></span>
+            <span style="font-size:.75rem;color:var(--text-secondary)">${u.personal_phone || '—'}</span>
+            <span class="status-dot ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Actif' : 'Inactif'}</span>
+            <span class="actions">
+              <button onclick='openEdit(${JSON.stringify(u).replace(/'/g,"&#39;")})'>Modifier</button>
+              <button onclick="resetPwd(${u.id})">MdP</button>
+              <button class="del" onclick="deleteUser(${u.id},'${u.first_name}')">Suppr</button>
+            </span>
+          </div>
+        `).join("");
+      } catch(e) { console.error(e); }
+    }
+
+    function openCreate() {
+      document.getElementById("modalTitle").textContent = "Ajouter un employe";
+      document.getElementById("editId").value = "";
+      document.getElementById("mFirstName").value = "";
+      document.getElementById("mLastName").value = "";
+      document.getElementById("mEmail").value = "";
+      document.getElementById("mRole").value = "agent";
+      document.getElementById("mPhone").value = "";
+      document.getElementById("pwdReveal").style.display = "none";
+      document.getElementById("btnSave").textContent = "Creer";
+      document.getElementById("mEmail").disabled = false;
+      document.getElementById("userModal").classList.add("visible");
+    }
+
+    function openEdit(u) {
+      document.getElementById("modalTitle").textContent = "Modifier employe";
+      document.getElementById("editId").value = u.id;
+      document.getElementById("mFirstName").value = u.first_name;
+      document.getElementById("mLastName").value = u.last_name;
+      document.getElementById("mEmail").value = u.email;
+      document.getElementById("mRole").value = u.role;
+      document.getElementById("mPhone").value = u.personal_phone || "";
+      document.getElementById("pwdReveal").style.display = "none";
+      document.getElementById("btnSave").textContent = "Enregistrer";
+      document.getElementById("mEmail").disabled = false;
+      document.getElementById("userModal").classList.add("visible");
+    }
+
+    function closeModal() { document.getElementById("userModal").classList.remove("visible"); }
+
+    async function saveUser() {
+      const id = document.getElementById("editId").value;
+      const body = {
+        email: document.getElementById("mEmail").value,
+        firstName: document.getElementById("mFirstName").value,
+        lastName: document.getElementById("mLastName").value,
+        role: document.getElementById("mRole").value,
+        phone: document.getElementById("mPhone").value,
+      };
+      if (!body.email || !body.firstName) { showToast("Email et prenom requis", "error"); return; }
+
+      try {
+        if (id) {
+          const res = await api(`/users/${id}`, { method: "PUT", body: JSON.stringify(body) });
+          if (!res.ok) { const d = await res.json(); showToast(d.error, "error"); return; }
+          showToast("Employe modifie");
+          closeModal();
+        } else {
+          const res = await api("/users", { method: "POST", body: JSON.stringify(body) });
+          const data = await res.json();
+          if (!res.ok) { showToast(data.error, "error"); return; }
+          document.getElementById("pwdReveal").style.display = "block";
+          document.getElementById("pwdValue").textContent = data.generatedPassword;
+          document.getElementById("btnSave").disabled = true;
+          document.getElementById("mEmail").disabled = true;
+          showToast(`Employe ${data.firstName} cree`);
+        }
+        loadUsers();
+      } catch(e) { showToast("Erreur: " + e.message, "error"); }
+    }
+
+    async function deleteUser(id, name) {
+      if (!confirm(`Desactiver ${name} ?`)) return;
+      try {
+        await api(`/users/${id}`, { method: "DELETE" });
+        showToast(`${name} desactive`);
+        loadUsers();
+      } catch(e) { showToast("Erreur", "error"); }
+    }
+
+    async function resetPwd(id) {
+      try {
+        const res = await api(`/users/${id}/reset-password`, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) { showToast(data.error, "error"); return; }
+        document.getElementById("resetPwdValue").textContent = data.generatedPassword;
+        document.getElementById("resetModal").classList.add("visible");
+      } catch(e) { showToast("Erreur", "error"); }
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
