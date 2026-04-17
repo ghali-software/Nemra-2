@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nemra AI — Standard Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060911;
+      --surface: rgba(13, 17, 28, 0.7);
+      --surface-solid: #0d111c;
+      --glass: rgba(15, 20, 35, 0.55);
+      --glass-border: rgba(255,255,255,0.06);
+      --glass-border-hover: rgba(255,255,255,0.1);
+      --accent: #0ef6cc;
+      --accent-dim: rgba(14, 246, 204, 0.12);
+      --accent-glow: rgba(14, 246, 204, 0.25);
+      --blue: #3b82f6;
+      --blue-dim: rgba(59, 130, 246, 0.12);
+      --amber: #fbbf24;
+      --amber-dim: rgba(251, 191, 36, 0.1);
+      --red: #f43f5e;
+      --red-dim: rgba(244, 63, 94, 0.1);
+      --text: #e8ecf4;
+      --text-secondary: #7a8599;
+      --text-tertiary: #4a5568;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Ambient background ── */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 15% 20%, rgba(14,246,204,0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 85% 80%, rgba(59,130,246,0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(14,246,204,0.015) 0%, transparent 60%);
+      animation: meshDrift 20s ease-in-out infinite alternate;
+    }
+    @keyframes meshDrift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(15deg); }
+    }
+
+    .noise-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      background: var(--glass);
+    }
+
+    .logo {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 1.3rem;
+      letter-spacing: -.03em;
+      display: flex; align-items: center; gap: .65rem;
+    }
+    .logo-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .85rem; color: #060911;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .logo-text span { color: var(--accent); }
+
+    .header-center { position: absolute; left: 50%; transform: translateX(-50%); }
+    .waveform-container {
+      display: flex; align-items: center; gap: 2px; height: 28px;
+      opacity: 0; transition: opacity .6s ease;
+    }
+    .waveform-container.active { opacity: 1; }
+    .wave-bar {
+      width: 3px; border-radius: 2px;
+      background: var(--accent);
+      height: 4px;
+      transition: height .15s ease;
+    }
+    .waveform-container.active .wave-bar { animation: wave 1.2s ease-in-out infinite; }
+    @keyframes wave {
+      0%, 100% { height: 4px; opacity: .3; }
+      50% { height: 22px; opacity: 1; }
+    }
+
+    .status-area { display: flex; align-items: center; gap: .75rem; }
+    .status-pill {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .4rem .9rem; border-radius: 999px;
+      font-size: .8rem; font-weight: 500;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      background: var(--glass);
+      transition: all .4s ease;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-tertiary); transition: all .4s ease; }
+    .status-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); animation: glow 2s infinite; }
+    .status-dot.transferring { background: var(--amber); box-shadow: 0 0 10px rgba(251,191,36,.4); animation: glow 1s infinite; }
+    @keyframes glow { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+    /* ── Main Grid ── */
+    .main {
+      position: relative; z-index: 10;
+      display: grid; grid-template-columns: 1fr 360px;
+      flex: 1; overflow: hidden;
+      gap: 1px;
+    }
+
+    /* ── Transcript Panel ── */
+    .transcript-panel {
+      display: flex; flex-direction: column;
+      padding: 1.25rem 1.5rem 1rem;
+      overflow: hidden;
+    }
+    .panel-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: .65rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .14em;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .panel-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(to right, var(--glass-border), transparent);
+    }
+
+    .transcript-body {
+      flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem;
+      padding-right: .5rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.08) transparent;
+    }
+    .transcript-body::-webkit-scrollbar { width: 4px; }
+    .transcript-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 2px; }
+
+    .msg {
+      max-width: 75%; padding: .7rem 1rem; border-radius: var(--radius-sm);
+      font-size: .88rem; line-height: 1.55;
+      animation: msgIn .35s cubic-bezier(.22,1,.36,1);
+      position: relative;
+    }
+    .msg.user {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-bottom-left-radius: 3px;
+    }
+    .msg.agent {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(14,246,204,0.1), rgba(59,130,246,0.08));
+      border: 1px solid rgba(14,246,204,0.12);
+      border-bottom-right-radius: 3px;
+    }
+    .msg .label {
+      font-family: 'Outfit', sans-serif;
+      font-size: .6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: .25rem;
+    }
+    .msg.user .label { color: var(--text-tertiary); }
+    .msg.agent .label { color: var(--accent); }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(12px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; gap: 1.5rem; text-align: center;
+    }
+    .empty-rings {
+      position: relative; width: 120px; height: 120px;
+    }
+    .empty-rings .ring {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(14,246,204,0.1);
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+    .empty-rings .ring:nth-child(1) { inset: 0; animation-delay: 0s; }
+    .empty-rings .ring:nth-child(2) { inset: 15px; animation-delay: .4s; border-color: rgba(14,246,204,0.15); }
+    .empty-rings .ring:nth-child(3) { inset: 30px; animation-delay: .8s; border-color: rgba(14,246,204,0.2); }
+    .empty-rings .ring-dot {
+      position: absolute; inset: 45px;
+      border-radius: 50%; background: var(--accent); opacity: .15;
+      animation: ringPulse 3s ease-in-out infinite 1.2s;
+    }
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: .5; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+    .empty-text { color: var(--text-secondary); font-size: .9rem; line-height: 1.6; }
+    .empty-text strong { color: var(--accent); font-weight: 600; }
+    .empty-text .phone {
+      display: inline-block; margin-top: .5rem;
+      font-family: 'JetBrains Mono', monospace; font-size: .95rem;
+      padding: .35rem .8rem; border-radius: 8px;
+      background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(14,246,204,0.15);
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      display: flex; flex-direction: column; gap: 1px;
+      overflow-y: auto; padding: 1.25rem 1.25rem 1rem;
+      border-left: 1px solid var(--glass-border);
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.06) transparent;
+    }
+
+    .s-card {
+      padding: 1rem 1.15rem; border-radius: var(--radius-sm);
+      background: var(--glass); border: 1px solid var(--glass-border);
+      margin-bottom: .75rem;
+      transition: border-color .3s ease;
+    }
+    .s-card:hover { border-color: var(--glass-border-hover); }
+    .s-card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: .6rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--text-tertiary); margin-bottom: .6rem;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .s-card-title .icon { font-size: .75rem; }
+    .s-card-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .95rem; font-weight: 500; color: var(--text);
+    }
+    .s-card-sub { font-size: .78rem; color: var(--text-secondary); margin-top: .3rem; }
+
+    .s-card-value.duration {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem; font-weight: 300; letter-spacing: .04em;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .intent-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .35rem .75rem; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem; font-weight: 600;
+      background: var(--accent-dim); color: var(--accent);
+      border: 1px solid rgba(14,246,204,0.12);
+      animation: badgeIn .4s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes badgeIn { from { opacity: 0; scale: .9; } to { opacity: 1; scale: 1; } }
+
+    .transfer-card {
+      background: linear-gradient(135deg, rgba(14,246,204,0.06), rgba(59,130,246,0.04));
+      border: 1px solid rgba(14,246,204,0.12); border-radius: var(--radius-sm);
+      padding: .85rem 1rem; animation: badgeIn .4s cubic-bezier(.22,1,.36,1);
+    }
+    .transfer-card .name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 1.05rem; color: var(--accent);
+    }
+    .transfer-card .role { font-size: .78rem; color: var(--text-secondary); margin-top: .15rem; }
+    .transfer-card .number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .72rem; color: var(--text-tertiary); margin-top: .4rem;
+    }
+
+    .returning {
+      background: var(--amber-dim); border: 1px solid rgba(251,191,36,0.15);
+      border-radius: var(--radius-sm); padding: .85rem 1rem;
+      animation: badgeIn .4s cubic-bezier(.22,1,.36,1);
+    }
+    .returning .name { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--amber); }
+    .returning .detail { font-size: .78rem; color: var(--text-secondary); margin-top: .35rem; line-height: 1.5; }
+
+    .timeline { display: flex; flex-direction: column; gap: .6rem; }
+    .timeline-item {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .78rem; color: var(--text-secondary);
+      animation: msgIn .3s cubic-bezier(.22,1,.36,1);
+    }
+    .timeline-marker {
+      width: 8px; height: 8px; border-radius: 50%;
+      margin-top: .25rem; flex-shrink: 0;
+      background: var(--text-tertiary);
+      position: relative;
+    }
+    .timeline-marker.done { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+    .timeline-marker.active { background: var(--amber); box-shadow: 0 0 6px rgba(251,191,36,.3); animation: glow 1.2s infinite; }
+    .timeline-marker.error { background: var(--red); box-shadow: 0 0 6px rgba(244,63,94,.3); }
+    .timeline-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem; color: var(--text-tertiary); min-width: 54px;
+    }
+    .timeline-text { line-height: 1.4; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+      .sidebar { max-height: 45vh; border-left: none; border-top: 1px solid var(--glass-border); }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+  <div class="noise-overlay"></div>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">N</div>
+      <div class="logo-text"><span>Nemra</span> AI</div>
+    </div>
+
+    <div class="header-center">
+      <div class="waveform-container" id="waveform"></div>
+    </div>
+
+    <div class="status-area">
+      <div class="status-pill">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">En attente d'appel</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="transcript-panel">
+      <div class="panel-label">Transcription en direct</div>
+      <div class="transcript-body" id="transcript">
+        <div class="empty-state">
+          <div class="empty-rings">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring-dot"></div>
+          </div>
+          <div class="empty-text">
+            Le standard IA attend un appel.<br>
+            <span class="phone">+1 510 443-8339</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="s-card">
+        <div class="s-card-title"><span class="icon">tel</span> Appelant</div>
+        <div class="s-card-value" id="callerNumber">--</div>
+        <div class="s-card-sub" id="callerInfo"></div>
+      </div>
+
+      <div class="s-card">
+        <div class="s-card-title"><span class="icon">id</span> Reconnaissance</div>
+        <div id="returningCaller"><span class="s-card-sub">Aucune donnee</span></div>
+      </div>
+
+      <div class="s-card">
+        <div class="s-card-title"><span class="icon">brain</span> Intention</div>
+        <div id="intentArea"><span class="s-card-sub">En ecoute...</span></div>
+      </div>
+
+      <div class="s-card">
+        <div class="s-card-title"><span class="icon">fwd</span> Transfert</div>
+        <div id="transferArea"><span class="s-card-sub">--</span></div>
+      </div>
+
+      <div class="s-card">
+        <div class="s-card-title"><span class="icon">log</span> Chronologie</div>
+        <div class="timeline" id="timeline"></div>
+      </div>
+
+      <div class="s-card" style="text-align:center;">
+        <div class="s-card-title" style="justify-content:center"><span class="icon">clock</span> Duree</div>
+        <div class="s-card-value duration" id="duration">0:00</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Build waveform bars ── */
+    (function() {
+      const wf = document.getElementById("waveform");
+      for (let i = 0; i < 32; i++) {
+        const bar = document.createElement("div");
+        bar.className = "wave-bar";
+        bar.style.animationDelay = `${(i * 0.06) % 1.2}s`;
+        wf.appendChild(bar);
+      }
+    })();
+
+    const $ = (id) => document.getElementById(id);
+    const ws = new WebSocket(`wss://${location.host}/dashboard-ws`);
+    let callActive = false;
+    let callStartTime = null;
+    let durationInterval = null;
+    let lastAgentMsg = null;
+
+    function setStatus(status, text) {
+      const dot = $("statusDot");
+      dot.className = "status-dot";
+      if (status === "active") dot.classList.add("active");
+      if (status === "transferring") dot.classList.add("transferring");
+      $("statusText").textContent = text;
+      const wf = $("waveform");
+      if (status === "active" || status === "transferring") wf.classList.add("active");
+      else wf.classList.remove("active");
+    }
+
+    function addTimeline(text, state = "done") {
+      const t = $("timeline");
+      const time = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      t.innerHTML += `<div class="timeline-item"><div class="timeline-marker ${state}"></div><span class="timeline-time">${time}</span><span class="timeline-text">${text}</span></div>`;
+      t.scrollTop = t.scrollHeight;
+    }
+
+    function addMsg(role, text) {
+      const t = $("transcript");
+      const empty = t.querySelector(".empty-state");
+      if (empty) empty.remove();
+
+      if (role === "agent") {
+        if (lastAgentMsg) {
+          lastAgentMsg.querySelector(".text").textContent += " " + text;
+          t.scrollTop = t.scrollHeight;
+          return;
+        }
+        const d = document.createElement("div");
+        d.className = "msg agent";
+        d.innerHTML = `<div class="label">Agent IA</div><div class="text">${text}</div>`;
+        t.appendChild(d);
+        lastAgentMsg = d;
+      } else {
+        lastAgentMsg = null;
+        const d = document.createElement("div");
+        d.className = "msg user";
+        d.innerHTML = `<div class="label">Appelant</div><div class="text">${text}</div>`;
+        t.appendChild(d);
+      }
+      t.scrollTop = t.scrollHeight;
+    }
+
+    function reset() {
+      $("transcript").innerHTML = `<div class="empty-state"><div class="empty-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring-dot"></div></div><div class="empty-text">Le standard IA attend un appel.<br><span class="phone">+1 510 443-8339</span></div></div>`;
+      $("callerNumber").textContent = "--";
+      $("callerInfo").textContent = "";
+      $("returningCaller").innerHTML = `<span class="s-card-sub">Aucune donnee</span>`;
+      $("intentArea").innerHTML = `<span class="s-card-sub">En ecoute...</span>`;
+      $("transferArea").innerHTML = `<span class="s-card-sub">--</span>`;
+      $("timeline").innerHTML = "";
+      $("duration").textContent = "0:00";
+      lastAgentMsg = null;
+      if (durationInterval) clearInterval(durationInterval);
+    }
+
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+
+      switch (msg.type) {
+        case "call_start":
+          reset();
+          callActive = true;
+          callStartTime = Date.now();
+          $("callerNumber").textContent = msg.from || "Inconnu";
+          setStatus("active", "Appel en cours");
+          addTimeline("Appel recu", "done");
+          durationInterval = setInterval(() => {
+            const s = Math.round((Date.now() - callStartTime) / 1000);
+            $("duration").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+          }, 1000);
+          break;
+
+        case "transcript":
+          addMsg(msg.role, msg.text);
+          break;
+
+        case "returning_caller":
+          $("returningCaller").innerHTML = `<div class="returning"><div class="name">${msg.name}</div><div class="detail">Dernier appel : ${msg.lastDate}<br>${msg.lastSubject}</div></div>`;
+          addTimeline(`Appelant reconnu : ${msg.name}`, "done");
+          break;
+
+        case "intent":
+          $("intentArea").innerHTML = `<span class="intent-badge">${msg.intent}</span>` + (msg.target ? `<div class="s-card-sub" style="margin-top:.5rem">Vers ${msg.target}</div>` : "");
+          addTimeline(`Intention : ${msg.intent}`, "done");
+          break;
+
+        case "transfer":
+          $("transferArea").innerHTML = `<div class="transfer-card"><div class="name">${msg.target}</div><div class="role">${msg.role}</div><div class="number">${msg.number}</div></div>`;
+          addTimeline(`Transfert vers ${msg.target}`, "active");
+          break;
+
+        case "status":
+          if (msg.status === "transferring") setStatus("transferring", "Transfert en cours...");
+          else if (msg.status === "transferred") { setStatus("active", "Transfere"); addTimeline("Transfert reussi", "done"); }
+          else if (msg.status === "transfer_failed") { setStatus("active", "Echec transfert"); addTimeline("Transfert echoue", "error"); }
+          else if (msg.status === "ended") setStatus("active", "Appel termine");
+          break;
+
+        case "call_end":
+          callActive = false;
+          if (durationInterval) clearInterval(durationInterval);
+          $("duration").textContent = `${Math.floor(msg.duration / 60)}:${String(msg.duration % 60).padStart(2, "0")}`;
+          setStatus("", `Termine (${msg.duration}s)`);
+          addTimeline("Appel termine", "done");
+          break;
+      }
+    };
+
+    ws.onclose = () => setStatus("", "Deconnecte du serveur");
+    ws.onerror = () => setStatus("", "Erreur de connexion");
+  </script>
+</body>
+</html>

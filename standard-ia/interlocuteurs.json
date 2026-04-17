@@ -1,0 +1,62 @@
+{
+  "entreprise": "Nemra Cowork",
+  "standard_version": "1.0",
+  "langues_supportees": ["darija", "francais"],
+  "interlocuteurs": [
+    {
+      "id": "oumaima",
+      "nom": "Oumaima",
+      "poste": "Responsable commercial & visites",
+      "numero": "+212664404338",
+      "prend_les_appels_pour": [
+        "réservation de bureau privé",
+        "abonnement mensuel ou annuel",
+        "tarifs et devis",
+        "visite des locaux",
+        "question sur les formules (journée, semaine, mois)",
+        "salle de réunion (booking, prix)"
+      ],
+      "horaires": "Lun-Ven 09h-18h",
+      "fallback_si_absent": "zineb"
+    },
+    {
+      "id": "ghali",
+      "nom": "Ghali",
+      "poste": "Fondateur & relations partenaires / presse",
+      "numero": "+212665091985",
+      "prend_les_appels_pour": [
+        "demande de partenariat",
+        "presse / médias / interview",
+        "événement ou location de l'espace événementiel",
+        "investisseur ou opportunité business",
+        "demande stratégique ou direction"
+      ],
+      "horaires": "Lun-Ven 10h-19h (sur RDV)",
+      "fallback_si_absent": "message_rappel"
+    },
+    {
+      "id": "zineb",
+      "nom": "Zineb",
+      "poste": "Support clients & community manager",
+      "numero": "+212660579433",
+      "prend_les_appels_pour": [
+        "membre existant avec une question (badge, wifi, impression)",
+        "réclamation ou incident sur place",
+        "changement de formule ou annulation",
+        "facturation, paiement, reçu",
+        "demande pratique (parking, climat, bruit, voisin)",
+        "information générale sur Nemra"
+      ],
+      "horaires": "Lun-Sam 09h-20h",
+      "fallback_si_absent": "oumaima"
+    }
+  ],
+  "regles_routage": {
+    "cas_ambigus": "Si l'appelant hésite ou donne une info multi-sujets, l'IA pose UNE question de clarification avant de router.",
+    "appelant_connu": "Si l'appelant dit qu'il est déjà membre Nemra → route par défaut vers Zineb (support).",
+    "urgence": "Si l'appelant dit 'urgent' ou 'problème sur place maintenant' → Zineb immédiatement, sans qualification longue.",
+    "hors_horaires": "Si l'interlocuteur est hors horaires, l'IA le signale et propose : (a) laisser un message vocal, (b) rappel au prochain créneau, (c) transfert vers le fallback_si_absent.",
+    "langue": "L'IA détecte la langue de l'appelant à son 1er mot (darija vs français) et répond dans cette langue. Jamais en arabe standard.",
+    "transfert_max": "Un seul transfert par appel. Si l'appelant veut parler à quelqu'un d'autre après transfert, il rappelle."
+  }
+}

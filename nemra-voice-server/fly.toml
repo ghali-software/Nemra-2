@@ -1,0 +1,20 @@
+app = "nemra-voice"
+primary_region = "cdg"
+
+[build]
+
+[env]
+  PORT = "8080"
+  PUBLIC_HOST = "nemra-voice.fly.dev"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

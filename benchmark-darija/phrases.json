@@ -1,0 +1,72 @@
+[
+  {
+    "id": "01_accueil_darija",
+    "lang": "darija",
+    "scene": "Accueil standard",
+    "text": "Salam 3likoum, ana l-mouss3ida dyal Nemra cowork, kifach n9der n3awnak lyoum?",
+    "style_prompt": "Say warmly in Moroccan Darija with a welcoming, professional female voice"
+  },
+  {
+    "id": "02_accueil_francais",
+    "lang": "français",
+    "scene": "Accueil standard FR",
+    "text": "Bonjour, vous êtes au standard automatique de Nemra. Que puis-je faire pour vous aider aujourd'hui ?",
+    "style_prompt": "Say warmly in French with a professional, slightly Moroccan-accented female voice"
+  },
+  {
+    "id": "03_qualification_darija",
+    "lang": "darija",
+    "scene": "Qualification appelant",
+    "text": "Mezyan. 3afak, goul lia smitek, u 3la ach bghiti tahdar bach nwejhek l chi-wa7ed li ghadi y3awnak mezyan.",
+    "style_prompt": "Say in Moroccan Darija with a calm, attentive, female voice asking for information"
+  },
+  {
+    "id": "04_transfert_darija",
+    "lang": "darija",
+    "scene": "Annonce de transfert",
+    "text": "Wakha sidi, ghadi n7awlek daba m3a l-mas2oul 3la had l-mawdou3. 3afak stena chwiya matkht3ch.",
+    "style_prompt": "Say in Moroccan Darija with a reassuring, professional female voice"
+  },
+  {
+    "id": "05_attente_darija",
+    "lang": "darija",
+    "scene": "Mise en attente prolongée",
+    "text": "Baqi kansayebhoum lik, chokran bzzaf 3la sabrak, thani thania ghir.",
+    "style_prompt": "Say apologetically in Moroccan Darija with a patient, warm female voice"
+  },
+  {
+    "id": "06_repeter_darija",
+    "lang": "darija",
+    "scene": "Demande de répétition",
+    "text": "Sma7 lia, ma kadwich mezyan l-khet. 3afak, t9der t3awed li goulti daba?",
+    "style_prompt": "Say politely in Moroccan Darija with a gentle apologetic female voice"
+  },
+  {
+    "id": "07_indispo_darija",
+    "lang": "darija",
+    "scene": "Interlocuteur indisponible",
+    "text": "Had l-mas2oul f ijtima3 daba u ma9derch yjaweb. Bghiti t5alli lih message walla y3ayet lik m3a ba3d?",
+    "style_prompt": "Say in Moroccan Darija with a helpful, solution-oriented female voice"
+  },
+  {
+    "id": "08_transfert_francais",
+    "lang": "français",
+    "scene": "Transfert explicite FR",
+    "text": "Parfait, je vous mets en relation avec Youssef du service commercial. Ne quittez pas, je vous passe la ligne.",
+    "style_prompt": "Say in French with a professional receptionist female voice, clear and reassuring"
+  },
+  {
+    "id": "09_cloture_darija",
+    "lang": "darija",
+    "scene": "Clôture d'appel",
+    "text": "Chokran bzzaf 3la l-ittisal bina, nhar sa3id, u bslama.",
+    "style_prompt": "Say warmly in Moroccan Darija with a friendly closing female voice"
+  },
+  {
+    "id": "10_erreur_darija",
+    "lang": "darija",
+    "scene": "Incident technique",
+    "text": "Sma7 lia, kayn chi mochkil tekniki f l-khet. 3afak, 3awd l-ittisal mora chi daqiqa walla jarrab b numero a5or.",
+    "style_prompt": "Say apologetically in Moroccan Darija with a concerned but composed female voice"
+  }
+]
